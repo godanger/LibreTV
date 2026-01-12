@@ -340,7 +340,7 @@ function renderDoubanTags(tags) {
         const btn = document.createElement('button');
         
         // 设置样式
-        let btnClass = 'py-1.5 px-3.5 rounded text-sm font-medium transition-all duration-300 border ';
+        let btnClass = 'py-1.5 px-2.5 rounded text-sm font-medium transition-all duration-300 border ';
         
         // 当前选中的标签使用高亮样式
         if (tag === doubanCurrentTag) {
