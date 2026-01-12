@@ -510,4 +510,4 @@ const CUSTOM_API_CONFIG = {
 };
 
 // 隐藏内置黄色采集站API的变量
-const HIDE_BUILTIN_ADULT_APIS = false;
+const HIDE_BUILTIN_ADULT_APIS = true;
