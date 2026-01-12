@@ -346,7 +346,7 @@ function renderDoubanTags(tags) {
         if (tag === doubanCurrentTag) {
             btnClass += 'bg-[#161b22] text-white shadow-md border-[#2563eb]';
         } else {
-            btnClass += 'bg-[#111827] text-gray-300 hover:bg-yellow-800 hover:text-[#D3E1F4] border-[#1f2937] hover:border-white';
+            btnClass += 'bg-[#111827] text-gray-300 hover:bg-yellow-800 hover:text-[#D3E1F4] border-[#1f2937] hover:border-[#2563eb]';
         }
         
         btn.className = btnClass;
