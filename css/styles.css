@@ -45,8 +45,8 @@ LibreTV 全局样式
     --text-color: #e6f2ff;          /* 柔和的蓝白色文本 */
     --text-muted: #8599b2;          /* 淡蓝灰色次级文本 */
     --border-color: rgba(0, 204, 255, 0.15);
-    --page-gradient-start: #0f1622; /* 深蓝黑起始色 */
-    --page-gradient-end: #192231;   /* 深靛蓝结束色 */
+    --page-gradient-start: #0d1117; /* 深蓝黑起始色 */
+    --page-gradient-end: #1c1d21;   /* 深靛蓝结束色 */
     --card-gradient-start: #121b29; /* 卡片起始色 */
     --card-gradient-end: #1c2939;   /* 卡片结束色 */
     --card-accent: rgba(0, 204, 255, 0.12); /* 霓虹蓝卡片强调色 */
