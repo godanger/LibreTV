@@ -616,7 +616,7 @@ function showTagManageModal() {
                         // "热门"标签不能删除
                         const canDelete = tag !== '热门';
                         return `
-                            <div class="bg-[#1a1a1a] text-gray-300 py-1.5 px-2 rounded text-sm font-medium flex justify-between items-center group">
+                            <div class="bg-[#1a1a1a] text-gray-300 py-1.5 rounded text-sm font-medium flex justify-between items-center group">
                                 <span>${tag}</span>
                                 ${canDelete ? 
                                     `<button class="delete-tag-btn text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" 
