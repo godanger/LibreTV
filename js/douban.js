@@ -344,9 +344,9 @@ function renderDoubanTags(tags) {
         
         // 当前选中的标签使用高亮样式
         if (tag === doubanCurrentTag) {
-            btnClass += 'bg-orange-600 text-white shadow-md border-white';
+            btnClass += 'bg-red-800 text-white shadow-md border-white';
         } else {
-            btnClass += 'bg-[#1a1a1a] text-gray-300 hover:bg-orange-700 hover:text-white border-[#333] hover:border-white';
+            btnClass += 'bg-[#1a1a1a] text-gray-300 hover:bg-red-800 hover:text-white border-[#333] hover:border-white';
         }
         
         btn.className = btnClass;
