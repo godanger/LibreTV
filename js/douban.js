@@ -53,45 +53,6 @@ let doubanCurrentTag = '热门';
 let doubanPageStart = 0;
 const doubanPageSize = 16; // 一次显示的项目数量
 
-// 专门的函数来生成视频占位图元素
-function createVideoPlaceholderElement(title, isLarge = false) {
-    const placeholder = document.createElement('div');
-    placeholder.className = 'w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900';
-    
-    // 根据尺寸调整图标大小
-    const iconSize = isLarge ? 'w-16 h-16' : 'w-12 h-12';
-    const textSize = isLarge ? 'text-sm' : 'text-xs';
-    
-    // 创建一个SVG视频图标
-    const svgHTML = `
-        <div class="text-center p-4">
-            <svg class="${iconSize} mx-auto text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-            </svg>
-            <div class="text-gray-400 ${textSize} max-w-full px-2 truncate">${title}</div>
-            <div class="text-gray-500 ${textSize} mt-1">封面加载失败</div>
-        </div>
-    `;
-    
-    placeholder.innerHTML = svgHTML;
-    return placeholder;
-}
-
-// 专门的函数来创建图片占位图（加载中状态）
-function createImageLoadingPlaceholder() {
-    const placeholder = document.createElement('div');
-    placeholder.className = 'w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900';
-    
-    placeholder.innerHTML = `
-        <div class="text-center">
-            <div class="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin inline-block mb-2"></div>
-            <div class="text-gray-400 text-xs">加载中...</div>
-        </div>
-    `;
-    
-    return placeholder;
-}
-
 // 初始化豆瓣功能
 function initDouban() {
     // 设置豆瓣开关的初始状态
@@ -473,7 +434,7 @@ function renderRecommend(tag, pageLimit, pageStart) {
             console.error("获取豆瓣数据失败：", error);
             container.innerHTML = `
                 <div class="col-span-full text-center py-8">
-                    <div class="text-red-400">? 获取豆瓣数据失败，请稍后重试</div>
+                    <div class="text-red-400">❌ 获取豆瓣数据失败，请稍后重试</div>
                     <div class="text-gray-500 text-sm mt-2">提示：使用VPN可能有助于解决此问题</div>
                 </div>
             `;
@@ -538,7 +499,7 @@ async function fetchDoubanData(url) {
     }
 }
 
-// 渲染豆瓣卡片的逻辑
+// 抽取渲染豆瓣卡片的逻辑到单独函数
 function renderDoubanCards(data, container) {
     // 创建文档片段以提高性能
     const fragment = document.createDocumentFragment();
@@ -548,7 +509,7 @@ function renderDoubanCards(data, container) {
         const emptyEl = document.createElement("div");
         emptyEl.className = "col-span-full text-center py-8";
         emptyEl.innerHTML = `
-            <div class="text-pink-500">? 暂无数据，请尝试其他分类或刷新</div>
+            <div class="text-pink-500">❌ 暂无数据，请尝试其他分类或刷新</div>
         `;
         fragment.appendChild(emptyEl);
     } else {
@@ -568,107 +529,37 @@ function renderDoubanCards(data, container) {
                 .replace(/>/g, '&gt;');
             
             // 处理图片URL
+            // 1. 直接使用豆瓣图片URL (添加no-referrer属性)
             const originalCoverUrl = item.cover;
+            
+            // 2. 也准备代理URL作为备选
             const proxiedCoverUrl = PROXY_URL + encodeURIComponent(originalCoverUrl);
             
-            // 创建图片容器
-            const imgDiv = document.createElement('div');
-            imgDiv.className = 'relative w-full aspect-[2/3] overflow-hidden cursor-pointer bg-gray-900';
-            imgDiv.onclick = function() {
-                fillAndSearchWithDouban(safeTitle);
-            };
-            
-            // 首先显示加载占位图
-            const loadingPlaceholder = createImageLoadingPlaceholder();
-            imgDiv.appendChild(loadingPlaceholder);
-            
-            // 创建图片元素（但不立即添加到DOM）
-            const img = document.createElement('img');
-            img.alt = safeTitle;
-            img.className = 'absolute inset-0 w-full h-full object-cover transition-transform duration-500 hover:scale-110 hidden';
-            img.loading = 'lazy';
-            img.referrerPolicy = 'no-referrer';
-            
-            // 图片加载成功处理
-            img.onload = function() {
-                // 显示图片，隐藏占位图
-                this.classList.remove('hidden');
-                if (loadingPlaceholder.parentElement === imgDiv) {
-                    imgDiv.removeChild(loadingPlaceholder);
-                }
-            };
-            
-            // 图片加载错误处理
-            img.onerror = function() {
-                console.log(`图片加载失败，尝试使用代理URL: ${originalCoverUrl}`);
-                
-                // 第一次加载失败，尝试代理URL
-                if (this.src !== proxiedCoverUrl && this.src !== VIDEO_PLACEHOLDER_URL) {
-                    this.src = proxiedCoverUrl;
-                    return; // 返回，等待代理URL的结果
-                }
-                
-                // 如果代理URL也失败，使用视频占位图
-                console.log(`代理URL也失败，使用占位图: ${originalCoverUrl}`);
-                
-                // 移除加载占位图
-                if (loadingPlaceholder.parentElement === imgDiv) {
-                    imgDiv.removeChild(loadingPlaceholder);
-                }
-                
-                // 创建视频占位图
-                const videoPlaceholder = createVideoPlaceholderElement(safeTitle);
-                videoPlaceholder.className = 'w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900';
-                
-                // 移除图片元素，添加占位图
-                if (this.parentElement === imgDiv) {
-                    imgDiv.removeChild(this);
-                }
-                imgDiv.appendChild(videoPlaceholder);
-            };
-            
-            // 设置图片源（开始加载）
-            img.src = originalCoverUrl;
-            
-            // 将图片添加到容器
-            imgDiv.appendChild(img);
-            
-            // 添加渐变遮罩（只在图片上方显示）
-            const gradientOverlay = document.createElement('div');
-            gradientOverlay.className = 'absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60 pointer-events-none';
-            
-            // 评分标签
-            const ratingBadge = document.createElement('div');
-            ratingBadge.className = 'absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-sm z-10';
-            ratingBadge.innerHTML = `<span class="text-yellow-400">★</span> ${safeRate}`;
-            
-            // 豆瓣链接按钮
-            const doubanLink = document.createElement('div');
-            doubanLink.className = 'absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-sm hover:bg-[#333] transition-colors z-10';
-            doubanLink.innerHTML = `<a href="${item.url}" target="_blank" rel="noopener noreferrer" title="在豆瓣查看" onclick="event.stopPropagation();">??</a>`;
-            
-            // 组装图片部分
-            imgDiv.appendChild(gradientOverlay);
-            imgDiv.appendChild(ratingBadge);
-            imgDiv.appendChild(doubanLink);
-            
-            // 标题部分
-            const titleDiv = document.createElement('div');
-            titleDiv.className = 'p-2 text-center bg-[#111] flex-grow flex flex-col justify-end';
-            
-            const titleBtn = document.createElement('button');
-            titleBtn.onclick = function() {
-                fillAndSearchWithDouban(safeTitle);
-            };
-            titleBtn.className = 'text-sm font-medium text-white truncate w-full hover:text-pink-400 transition text-center';
-            titleBtn.title = safeTitle;
-            titleBtn.textContent = safeTitle;
-            
-            titleDiv.appendChild(titleBtn);
-            
-            // 组装卡片
-            card.appendChild(imgDiv);
-            card.appendChild(titleDiv);
+            // 为不同设备优化卡片布局
+            card.innerHTML = `
+                <div class="relative w-full aspect-[2/3] overflow-hidden cursor-pointer" onclick="fillAndSearchWithDouban('${safeTitle}')">
+                    <img src="${originalCoverUrl}" alt="${safeTitle}" 
+                        class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                        onerror="this.onerror=null; this.src='${proxiedCoverUrl}'; this.classList.add('object-contain');"
+                        loading="lazy" referrerpolicy="no-referrer">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+                    <div class="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-sm">
+                        <span class="text-yellow-400">★</span> ${safeRate}
+                    </div>
+                    <div class="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-sm hover:bg-[#333] transition-colors">
+                        <a href="${item.url}" target="_blank" rel="noopener noreferrer" title="在豆瓣查看" onclick="event.stopPropagation();">
+                            🔗
+                        </a>
+                    </div>
+                </div>
+                <div class="p-2 text-center bg-[#111]">
+                    <button onclick="fillAndSearchWithDouban('${safeTitle}')" 
+                            class="text-sm font-medium text-white truncate w-full hover:text-pink-400 transition"
+                            title="${safeTitle}">
+                        ${safeTitle}
+                    </button>
+                </div>
+            `;
             
             fragment.appendChild(card);
         });
@@ -729,7 +620,7 @@ function showTagManageModal() {
                                 <span>${tag}</span>
                                 ${canDelete ? 
                                     `<button class="delete-tag-btn text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" 
-                                        data-tag="${tag}">?</button>` : 
+                                        data-tag="${tag}">✕</button>` : 
                                     `<span class="text-gray-500 text-xs italic opacity-0 group-hover:opacity-100">必需</span>`
                                 }
                             </div>
@@ -899,46 +790,4 @@ function resetTagsToDefault() {
     renderRecommend(doubanCurrentTag, doubanPageSize, doubanPageStart);
     
     showToast('已恢复默认标签', 'success');
-}
-
-// 另外，如果其他地方也需要视频占位图，可以创建一个通用的函数
-function createVideoThumbnail(title, rating = null, isLarge = false) {
-    const container = document.createElement('div');
-    container.className = 'relative w-full aspect-[2/3] overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900 flex flex-col items-center justify-center';
-    
-    // 视频图标
-    const iconSize = isLarge ? 'w-16 h-16' : 'w-12 h-12';
-    const textSize = isLarge ? 'text-sm' : 'text-xs';
-    
-    const icon = document.createElement('div');
-    icon.className = 'text-center mb-2';
-    icon.innerHTML = `
-        <svg class="${iconSize} mx-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-        </svg>
-    `;
-    
-    // 标题
-    const titleEl = document.createElement('div');
-    titleEl.className = `text-gray-400 ${textSize} max-w-full px-2 truncate text-center`;
-    titleEl.textContent = title;
-    
-    // 副标题
-    const subtitle = document.createElement('div');
-    subtitle.className = `text-gray-500 ${textSize} mt-1 text-center`;
-    subtitle.textContent = rating ? `评分: ${rating}` : '视频封面';
-    
-    container.appendChild(icon);
-    container.appendChild(titleEl);
-    container.appendChild(subtitle);
-    
-    // 如果提供了评分，添加评分徽章
-    if (rating) {
-        const ratingBadge = document.createElement('div');
-        ratingBadge.className = 'absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-sm';
-        ratingBadge.innerHTML = `<span class="text-yellow-400">★</span> ${rating}`;
-        container.appendChild(ratingBadge);
-    }
-    
-    return container;
 }
