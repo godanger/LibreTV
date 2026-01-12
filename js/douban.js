@@ -328,7 +328,7 @@ function renderDoubanTags(tags) {
 
     // 先添加标签管理按钮
     const manageBtn = document.createElement('button');
-    manageBtn.className = 'py-1.5 px-3 rounded text-sm font-medium transition-all duration-300 bg-[#111827] text-gray-300 hover:bg-pink-700 hover:text-[#D3E1F4] border border-[#333] hover:border-white';
+    manageBtn.className = 'py-1.5 px-3 rounded text-sm font-medium transition-all duration-300 bg-[#111827] text-gray-300 hover:bg-pink-700 hover:text-[#D3E1F4] border border-[#1f2937] hover:border-white';
     manageBtn.innerHTML = '<span class="flex items-center"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>管理标签</span>';
     manageBtn.onclick = function() {
         showTagManageModal();
@@ -344,9 +344,9 @@ function renderDoubanTags(tags) {
         
         // 当前选中的标签使用高亮样式
         if (tag === doubanCurrentTag) {
-            btnClass += 'bg-red-800 text-white shadow-md border-white';
+            btnClass += 'bg-yellow-800 text-white shadow-md border-white';
         } else {
-            btnClass += 'bg-[#1a1a1a] text-gray-300 hover:bg-red-800 hover:text-white border-[#333] hover:border-white';
+            btnClass += 'bg-[#111827] text-gray-300 hover:bg-yellow-800 hover:text-[#D3E1F4] border-[#1f2937] hover:border-white';
         }
         
         btn.className = btnClass;
