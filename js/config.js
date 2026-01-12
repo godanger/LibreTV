@@ -1,5 +1,5 @@
 // 全局常量配置
-const PROXY_URL = '';    // 适用于 Cloudflare, Netlify (带重写), Vercel (带重写)
+const PROXY_URL = 'https://libretv.liumingye.cn/proxy/';    // 适用于 Cloudflare, Netlify (带重写), Vercel (带重写)
 // const HOPLAYER_URL = 'https://hoplayer.com/index.html';
 const SEARCH_HISTORY_KEY = 'videoSearchHistory';
 const MAX_HISTORY_ITEMS = 5;
@@ -510,4 +510,4 @@ const CUSTOM_API_CONFIG = {
 };
 
 // 隐藏内置黄色采集站API的变量
-const HIDE_BUILTIN_ADULT_APIS = false;
+const HIDE_BUILTIN_ADULT_APIS = true;
