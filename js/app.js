@@ -195,7 +195,7 @@ function checkAdultAPIsSelected() {
 
         // 恢复原来的描述文字
         if (filterDescription) {
-            filterDescription.innerHTML = '过滤"伦理片"等内容';
+            filterDescription.innerHTML = '过滤"伦理片"等黄色内容';
         }
 
         // 移除提示信息
@@ -484,9 +484,21 @@ function toggleSettings(e) {
     const settingsPanel = document.getElementById('settingsPanel');
     if (!settingsPanel) return;
 
+    // 检查是否有管理员密码
+    const hasAdminPassword = window.__ENV__?.ADMINPASSWORD && 
+                           window.__ENV__.ADMINPASSWORD.length === 64 && 
+                           !/^0+$/.test(window.__ENV__.ADMINPASSWORD);
+
     if (settingsPanel.classList.contains('show')) {
         settingsPanel.classList.remove('show');
     } else {
+        // 只有设置了管理员密码且未验证时才拦截
+        if (hasAdminPassword && !isAdminVerified()) {
+            e.preventDefault();
+            e.stopPropagation();
+            showAdminPasswordModal();
+            return;
+        }
         settingsPanel.classList.add('show');
     }
 
@@ -605,22 +617,12 @@ function getCustomApiInfo(customApiIndex) {
 
 // 搜索功能 - 修改为支持多选API和多页结果
 async function search() {
-    // 强化的密码保护校验 - 防止绕过
-    try {
-        if (window.ensurePasswordProtection) {
-            window.ensurePasswordProtection();
-        } else {
-            // 兼容性检查
-            if (window.isPasswordProtected && window.isPasswordVerified) {
-                if (window.isPasswordProtected() && !window.isPasswordVerified()) {
-                    showPasswordModal && showPasswordModal();
-                    return;
-                }
-            }
+    // 密码保护校验
+    if (window.isPasswordProtected && window.isPasswordVerified) {
+        if (window.isPasswordProtected() && !window.isPasswordVerified()) {
+            showPasswordModal && showPasswordModal();
+            return;
         }
-    } catch (error) {
-        console.warn('Password protection check failed:', error.message);
-        return;
     }
     const query = document.getElementById('searchInput').value.trim();
 
@@ -743,8 +745,10 @@ async function search() {
             const apiUrlAttr = item.api_url ?
                 `data-api-url="${item.api_url.replace(/"/g, '&quot;')}"` : '';
 
-            // 修改为水平卡片布局，图片在左侧，文本在右侧，并优化样式
-            const hasCover = item.vod_pic && item.vod_pic.startsWith('http');
+            const coverUrl = item.vod_pic || '';
+            const hasCover = coverUrl && (coverUrl.startsWith('http://') || coverUrl.startsWith('https://'));
+            const localPlaceholder = 'image/nomedia.png';
+            const proxiedCoverUrl = hasCover ? PROXY_URL + encodeURIComponent(coverUrl) : '';
 
             return `
                 <div class="card-hover bg-[#111] rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.02] h-full shadow-sm hover:shadow-md" 
@@ -752,10 +756,10 @@ async function search() {
                     <div class="flex h-full">
                         ${hasCover ? `
                         <div class="relative flex-shrink-0 search-card-img-container">
-                            <img src="${item.vod_pic}" alt="${safeName}" 
+                            <img src="${coverUrl}" alt="${safeName}" 
                                  class="h-full w-full object-cover transition-transform hover:scale-110" 
-                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/300x450?text=无封面'; this.classList.add('object-contain');" 
-                                 loading="lazy">
+                                 onerror="this.onerror=null; this.src='${proxiedCoverUrl}'; this.onerror=function(){this.src='${localPlaceholder}'};"
+                                 loading="lazy" referrerpolicy="no-referrer">
                             <div class="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent"></div>
                         </div>` : ''}
                         
@@ -952,7 +956,7 @@ async function showDetails(id, vod_name, sourceCode) {
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-2">
                     <div class="flex items-center gap-2">
                         <button onclick="toggleEpisodeOrder('${sourceCode}', '${id}')" 
-                                class="px-3 py-1.5 bg-[#111827] hover:bg-[#1c1d21] border border-[#1f2937] rounded text-sm transition-colors flex items-center gap-1">
+                                class="px-3 py-1.5 bg-[#333] hover:bg-[#444] border border-[#444] rounded text-sm transition-colors flex items-center gap-1">
                             <svg class="w-4 h-4 transform ${episodesReversed ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
                             </svg>
