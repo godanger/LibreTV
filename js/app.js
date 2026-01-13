@@ -956,7 +956,7 @@ async function showDetails(id, vod_name, sourceCode) {
                 <div class="flex flex-wrap items-center justify-between mb-4 gap-2">
                     <div class="flex items-center gap-2">
                         <button onclick="toggleEpisodeOrder('${sourceCode}', '${id}')" 
-                                class="px-3 py-1.5 bg-[#333] hover:bg-[#444] border border-[#444] rounded text-sm transition-colors flex items-center gap-1">
+                                class="px-3 py-1.5 bg-[#161b22] hover:bg-[#111827] border border-[#1f2937] rounded text-sm transition-colors flex items-center gap-1">
                             <svg class="w-4 h-4 transform ${episodesReversed ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
                             </svg>
