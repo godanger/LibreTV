@@ -342,7 +342,6 @@ input:checked + .slider:before {
 }
 
 .resource-switch-btn {
-    background: #1f2937;
     align-items: center;
     background: none;
     border: none;
@@ -357,11 +356,11 @@ input:checked + .slider:before {
 }
 
 .resource-switch-btn:hover {
-    background: #111827;
+    background: #1f2937;
 }
 
 .resource-switch-btn:active {
-    background: #111827;
+    background: #1f2937;
 }
 
 .resource-switch-icon {
