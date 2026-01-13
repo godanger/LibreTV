@@ -356,18 +356,18 @@ input:checked + .slider:before {
 }
 
 .resource-switch-btn:hover {
-    background: #111827;
+    background: #222;
 }
 
 .resource-switch-btn:active {
-    background: #111827;
+    background: #222;
 }
 
 .resource-switch-icon {
     width: 20px;
     height: 20px;
     margin-right: 0;
-    color: #a67c2d;
+    color: #2563eb;
     vertical-align: middle;
     transition: transform 0.3s;
 }
