@@ -441,93 +441,60 @@ function renderRecommend(tag, pageLimit, pageStart) {
         });
 }
 
-async function fetchDoubanData(url) {
-    // 添加超时控制
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
+// 专门用于获取豆瓣图片的函数
+async function fetchDoubanImage(url) {
+    // 如果已经是完整URL，直接使用
+    const imageUrl = url.startsWith('http') ? url : `https://${decodeURIComponent(url)}`;
     
-    // 优化后的请求头配置
-    const fetchOptions = {
-        signal: controller.signal,
-        headers: {
-            // 用户代理（已正确）
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-            
-            // 引荐来源（已正确）
-            'Referer': 'https://movie.douban.com/',
-            
-            // 扩展Accept头，接受多种格式
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-            
-            // 添加语言头
-            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-            
-            // 添加编码
-            'Accept-Encoding': 'gzip, deflate, br',
-            
-            // 重要：缓存控制
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache',
-            
-            // 添加安全相关头部，模拟真实浏览器
-            'Sec-Fetch-Dest': 'document',
-            'Sec-Fetch-Mode': 'navigate',
-            'Sec-Fetch-Site': 'same-origin',
-            'Sec-Fetch-User': '?1',
-            
-            // 升级请求
-            'Upgrade-Insecure-Requests': '1',
-            
-            // 连接设置
-            'Connection': 'keep-alive'
-        },
-        // 重要：设置请求模式
-        mode: 'cors',
-        credentials: 'omit', // 豆瓣通常不需要cookies
-        redirect: 'follow'
-    };
+    console.log('直接访问豆瓣图片:', imageUrl);
+    
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous'; // 重要：允许跨域加载
+        
+        img.onload = () => {
+            console.log('图片加载成功:', imageUrl);
+            resolve({
+                url: imageUrl,
+                element: img,
+                width: img.width,
+                height: img.height,
+                status: 'success'
+            });
+        };
+        
+        img.onerror = (error) => {
+            console.error('图片加载失败:', imageUrl, error);
+            reject(new Error(`图片加载失败: ${imageUrl}`));
+        };
+        
+        // 开始加载
+        img.src = imageUrl;
+    });
+}
 
-    try {
-        // 添加鉴权参数到代理URL
-        const proxiedUrl = await window.ProxyAuth?.addAuthToProxyUrl ? 
-            await window.ProxyAuth.addAuthToProxyUrl(PROXY_URL + encodeURIComponent(url)) :
-            PROXY_URL + encodeURIComponent(url);
-            
-        // 尝试直接访问（豆瓣API可能允许部分CORS请求）
-        const response = await fetch(proxiedUrl, fetchOptions);
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        
-        return await response.json();
-    } catch (err) {
-        console.error("豆瓣 API 请求失败（直接代理）：", err);
-        
-        // 失败后尝试备用方法：作为备选
-        const fallbackUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-        
+// 批量加载图片
+async function loadDoubanImages(imageUrls) {
+    const results = [];
+    
+    for (const url of imageUrls) {
         try {
-            const fallbackResponse = await fetch(fallbackUrl);
+            // 添加延迟，避免请求过快
+            await new Promise(resolve => setTimeout(resolve, 100));
             
-            if (!fallbackResponse.ok) {
-                throw new Error(`备用API请求失败! 状态: ${fallbackResponse.status}`);
-            }
-            
-            const data = await fallbackResponse.json();
-            
-            // 解析原始内容
-            if (data && data.contents) {
-                return JSON.parse(data.contents);
-            } else {
-                throw new Error("无法获取有效数据");
-            }
-        } catch (fallbackErr) {
-            console.error("豆瓣 API 备用请求也失败：", fallbackErr);
-            throw fallbackErr; // 向上抛出错误，让调用者处理
+            const result = await fetchDoubanImage(url);
+            results.push(result);
+        } catch (error) {
+            console.warn('跳过失败的图片:', url);
+            results.push({
+                url,
+                error: error.message,
+                status: 'failed'
+            });
         }
     }
+    
+    return results;
 }
 
 // 抽取渲染豆瓣卡片的逻辑到单独函数
