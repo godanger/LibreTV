@@ -471,7 +471,6 @@ function loadMoreDoubanContent() {
 
 // 显示加载指示器（顶部）
 function showLoadingIndicator(container) {
-        indicator.className = 'bottom-loading-indicator col-span-full flex justify-center items-center py-4 mt-4';
     container.innerHTML = `
         <div class="col-span-full flex justify-center items-center py-8">
             <div class="w-8 h-8 border-3 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
