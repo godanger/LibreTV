@@ -471,10 +471,12 @@ function loadMoreDoubanContent() {
 
 // 显示加载指示器（顶部）
 function showLoadingIndicator(container) {
-    container.innerHTML = `
-        <div class="col-span-full flex justify-center items-center py-8">
-            <div class="w-8 h-8 border-3 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
-            <span class="text-pink-500 ml-3">加载中...</span>
+
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-10">
+            <div class="flex items-center justify-center">
+                <div class="w-6 h-6 border-2 border-pink-500 border-t-transparent rounded-full animate-spin inline-block"></div>
+                <span class="text-pink-500 ml-4">加载中...</span>
+            </div>
         </div>
     `;
 }
