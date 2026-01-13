@@ -1,7 +1,7 @@
 // 豆瓣热门电影电视剧推荐功能 - 滚动加载版本
 
 // 豆瓣标签列表 - 修改为默认标签
-let defaultMovieTags = ['热门', '最新', '经典', '豆瓣高分', '冷门佳片', '华语', '欧美', '韩国', '日本', '动作', '喜剧', '日综', '爱情', '科幻', '悬疑', '恐怖', '治愈'];
+let defaultMovieTags = ['热门', '最新', '经典', '豆瓣高分', '冷门佳片', '华语', '欧美', '韩国', '日本', '动作', '喜剧', '爱情', '科幻', '悬疑', '恐怖', '治愈'];
 let defaultTvTags = ['热门', '美剧', '英剧', '韩剧', '日剧', '国产剧', '港剧', '日本动画', '综艺', '纪录片'];
 
 // 用户标签列表 - 存储用户实际使用的标签（包含保留的系统标签和用户添加的自定义标签）
@@ -136,28 +136,6 @@ function updateDoubanVisibility() {
         }
     } else {
         doubanArea.classList.add('hidden');
-    }
-}
-
-// 只填充搜索框，不执行搜索，让用户自主决定搜索时机
-function fillSearchInput(title) {
-    if (!title) return;
-    
-    // 安全处理标题，防止XSS
-    const safeTitle = title
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    
-    const input = document.getElementById('searchInput');
-    if (input) {
-        input.value = safeTitle;
-        
-        // 聚焦搜索框，便于用户立即使用键盘操作
-        input.focus();
-        
-        // 显示一个提示，告知用户点击搜索按钮进行搜索
-        showToast('已填充搜索内容，点击搜索按钮开始搜索', 'info');
     }
 }
 
@@ -595,30 +573,6 @@ async function fetchDoubanData(url) {
             throw fallbackErr; // 向上抛出错误，让调用者处理
         }
     }
-}
-
-// 批量加载图片
-async function loadDoubanImages(imageUrls) {
-    const results = [];
-    
-    for (const url of imageUrls) {
-        try {
-            // 添加延迟，避免请求过快
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
-            const result = await fetchDoubanImage(url);
-            results.push(result);
-        } catch (error) {
-            console.warn('跳过失败的图片:', url);
-            results.push({
-                url,
-                error: error.message,
-                status: 'failed'
-            });
-        }
-    }
-    
-    return results;
 }
 
 // 渲染豆瓣卡片 - 支持追加模式
