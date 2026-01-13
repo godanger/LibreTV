@@ -54,7 +54,7 @@ let doubanPageStart = 0;
 let doubanTotalLoaded = 0;
 let doubanIsLoading = false;
 let doubanHasMore = true;
-const doubanPageSize = 36; // 每次加载的项目数量，稍微增加一些
+const doubanPageSize = 18; // 每次加载的项目数量，稍微增加一些
 
 // 初始化豆瓣功能
 function initDouban() {
