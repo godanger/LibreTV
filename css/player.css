@@ -356,11 +356,11 @@ input:checked + .slider:before {
 }
 
 .resource-switch-btn:hover {
-    background: #222;
+    background: #1f2937;
 }
 
 .resource-switch-btn:active {
-    background: #222;
+    background: #1f2937;
 }
 
 .resource-switch-icon {
