@@ -22,7 +22,7 @@ body, html {
     width: 100vw;
     z-index: 9000 !important;
     pointer-events: auto !important;
-    background: #111;
+    background: #161b22;
 }
 
 #homeButton { 
