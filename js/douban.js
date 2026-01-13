@@ -635,7 +635,7 @@ function renderDoubanCards(data, container, clear = true) {
                         <a href="${item.url}" target="_blank" rel="noopener noreferrer" title="在豆瓣查看" onclick="event.stopPropagation();"><span class="text-yellow-400">★</span> ${safeRate}</a>
                     </div>
                     <div class="absolute top-1 right-1 text-white text-xs rounded-sm backdrop-blur-sm transition-colors">
-                                                ${item.is_new ? '<span class="inline-block bg-red-500 text-white px-1.5 py-0.5 rounded text-xs mr-1">新</span>' : ''}
+                         ${item.is_new ? '<span class="inline-block bg-red-500 text-white px-1.5 py-0.5 rounded text-xs mr-1">新</span>' : ''}
                         <span>${item.episodes_info || ''}</span>
                     </div>
                 </div>
