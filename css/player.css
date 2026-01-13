@@ -345,7 +345,7 @@ input:checked + .slider:before {
     align-items: center;
     background: none;
     border: none;
-    color: #a67c2d;
+    color: #2563eb;
     font-weight: bold;
     font-size: 1rem;
     cursor: pointer;
@@ -356,11 +356,11 @@ input:checked + .slider:before {
 }
 
 .resource-switch-btn:hover {
-    background: #f5e9d7;
+    background: #111827;
 }
 
 .resource-switch-btn:active {
-    background: #f5e9d7;
+    background: #111827;
 }
 
 .resource-switch-icon {
