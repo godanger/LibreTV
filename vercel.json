@@ -15,10 +15,7 @@
     {
       "source": "/player.html/:path*",
       "destination": "/player.html"
-    },
-    {
-      "source": "/:path*",
-      "destination": "/:path*"
     }
   ]
 }
+

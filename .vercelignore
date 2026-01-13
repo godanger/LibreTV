@@ -1,0 +1,30 @@
+# Development files
+node_modules
+.git
+.github
+
+# Documentation
+*.md
+!README.md
+
+# Config files that aren't needed in production
+.dockerignore
+docker-compose.yml
+Dockerfile
+nodemon.json
+netlify.toml
+netlify
+render.yaml
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+
+# Editor directories and files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store

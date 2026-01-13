@@ -1,18 +1,106 @@
 {
-    "name": "LibreTV",
-    "short_name": "LibreTV",
-    "description": "免费在线视频搜索与观看平台",
-    "start_url": ".",
-    "display": "standalone",
-    "background_color": "#0f1622",
-    "theme_color": "#000000",
-    "apple-mobile-web-app-capable": "yes",
-    "apple-mobile-web-app-status-bar-style": "black",
-    "icons": [
-      {
-        "src": "image/logo-black.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      }
-    ]
-  }
+  "name": "LibreTV",
+  "short_name": "LibreTV",
+  "description": "免费在线视频搜索与观看平台",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "fullscreen", "minimal-ui"],
+  "background_color": "#0f1622",
+  "theme_color": "#000000",
+  "orientation": "any",
+  "categories": ["entertainment", "multimedia", "video"],
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "apple-mobile-web-app-capable": "yes",
+  "apple-mobile-web-app-status-bar-style": "black-translucent",
+  "apple-mobile-web-app-title": "LibreTV",
+  "shortcuts": [
+    {
+      "name": "搜索视频",
+      "short_name": "搜索",
+      "description": "快速搜索视频内容",
+      "url": "/?action=search",
+      "icons": [
+        {
+          "src": "image/logo.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "播放历史",
+      "short_name": "历史",
+      "description": "查看播放历史",
+      "url": "/?action=history",
+      "icons": [
+        {
+          "src": "image/logo.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "收藏夹",
+      "short_name": "收藏",
+      "description": "查看收藏的视频",
+      "url": "/?action=favorites",
+      "icons": [
+        {
+          "src": "image/logo.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "image/logo.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "LibreTV主界面截图"
+    }
+  ],
+  "icons": [
+    {
+      "src": "image/logo.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "image/logo.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "image/logo.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "image/logo.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "image/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "image/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
