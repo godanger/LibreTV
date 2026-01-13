@@ -110,43 +110,6 @@ function initDouban() {
     if (localStorage.getItem('doubanEnabled') === 'true') {
         renderRecommend(doubanCurrentTag, doubanPageSize, doubanPageStart);
     }
-
-        // 新增功能初始化
-    initDarkModeToggle();
-    initMasonryLayout();
-    showSmartSearchSuggestions();
-    userPreference.load();
-    watchlist.load();
-    enhanceCardHover();
-    
-    // 添加用户偏好推荐按钮
-    addPersonalizedRecommendationButton();
-}
-
-// 添加个性化推荐按钮
-function addPersonalizedRecommendationButton() {
-    const tagContainer = document.getElementById('douban-tags');
-    if (!tagContainer) return;
-    
-    const personalBtn = document.createElement('button');
-    personalBtn.id = 'personalized-recommend';
-    personalBtn.className = 'py-1.5 px-3 rounded text-sm font-medium transition-all duration-300 bg-purple-600 hover:bg-purple-700 text-white border border-purple-700';
-    personalBtn.innerHTML = '<span class="flex items-center"><svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>为你推荐</span>';
-    
-    personalBtn.onclick = async function() {
-        const recommendations = await userPreference.getPersonalizedRecommendations();
-        if (recommendations) {
-            renderPersonalizedRecommendations(recommendations);
-        } else {
-            showToast('暂无个性化推荐，请先观看一些内容', 'info');
-        }
-    };
-    
-    // 插入到标签容器的第二个位置（在管理按钮后面）
-    const manageBtn = tagContainer.querySelector('button');
-    if (manageBtn && manageBtn.nextSibling) {
-        tagContainer.insertBefore(personalBtn, manageBtn.nextSibling.nextSibling);
-    }
 }
 
 // 根据设置更新豆瓣区域的显示状态
@@ -561,8 +524,19 @@ async function loadDoubanImages(imageUrls) {
     return results;
 }
 
-// 抽取渲染豆瓣卡片的逻辑到单独函数
+// 抽取渲染豆瓣卡片的逻辑到单独函数 - 修改为瀑布流布局
 function renderDoubanCards(data, container) {
+    // 移除加载动画
+    const loadingOverlay = container.querySelector('.absolute');
+    if (loadingOverlay) {
+        container.removeChild(loadingOverlay);
+    }
+    
+    // 确保容器有瀑布流布局的样式
+    if (!container.classList.contains('waterfall-container')) {
+        container.className = 'waterfall-container grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4';
+    }
+    
     // 创建文档片段以提高性能
     const fragment = document.createDocumentFragment();
     
@@ -578,7 +552,7 @@ function renderDoubanCards(data, container) {
         // 循环创建每个影视卡片
         data.subjects.forEach(item => {
             const card = document.createElement("div");
-            card.className = "bg-[#111] hover:bg-[#222] transition-all duration-300 rounded-lg overflow-hidden flex flex-col transform hover:scale-105 shadow-md hover:shadow-lg";
+            card.className = "break-inside-avoid bg-[#111] hover:bg-[#222] transition-all duration-300 rounded-lg overflow-hidden flex flex-col transform hover:scale-[1.02] shadow-md hover:shadow-lg group";
             
             // 生成卡片内容，确保安全显示（防止XSS）
             const safeTitle = item.title
@@ -597,27 +571,31 @@ function renderDoubanCards(data, container) {
             // 2. 也准备代理URL作为备选
             const proxiedCoverUrl = PROXY_URL + encodeURIComponent(originalCoverUrl);
             
-            // 为不同设备优化卡片布局
+            // 创建瀑布流卡片，高度自适应图片
             card.innerHTML = `
                 <div class="relative w-full aspect-[2/3] overflow-hidden cursor-pointer" onclick="fillAndSearchWithDouban('${safeTitle}')">
                     <img src="${originalCoverUrl}" alt="${safeTitle}" 
-                        class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         onerror="this.onerror=null; this.src='${proxiedCoverUrl}'; this.classList.add('object-contain');"
                         loading="lazy" referrerpolicy="no-referrer">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
-                    <div class="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-sm">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="absolute bottom-2 left-2 bg-black/80 text-white text-xs px-2 py-1 rounded-sm backdrop-blur-sm">
                         <span class="text-yellow-400">★</span> ${safeRate}
                     </div>
-                    <div class="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-sm hover:bg-[#333] transition-colors">
+                    <div class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded-sm backdrop-blur-sm hover:bg-[#333] transition-colors">
                         <a href="${item.url}" target="_blank" rel="noopener noreferrer" title="在豆瓣查看" onclick="event.stopPropagation();"> ✙ </a> 
-                  </div>
+                    </div>
                 </div>
-                <div class="p-2 text-center bg-[#111]">
+                <div class="p-3 flex-1 bg-gradient-to-b from-[#111] to-[#0a0a0a]">
                     <button onclick="fillAndSearchWithDouban('${safeTitle}')" 
-                            class="text-sm font-medium text-white truncate w-full hover:text-pink-400 transition"
+                            class="text-sm font-medium text-white line-clamp-2 text-left w-full hover:text-pink-400 transition text-ellipsis overflow-hidden group-hover:text-pink-400"
                             title="${safeTitle}">
                         ${safeTitle}
                     </button>
+                    <div class="mt-2 text-xs text-gray-400 text-left">
+                        ${item.is_new ? '<span class="inline-block bg-red-500 text-white px-1.5 py-0.5 rounded text-xs mr-1">新</span>' : ''}
+                        <span>${item.episodes_info || ''}</span>
+                    </div>
                 </div>
             `;
             
@@ -625,9 +603,25 @@ function renderDoubanCards(data, container) {
         });
     }
     
-    // 清空并添加所有新元素
-    container.innerHTML = "";
+    // 添加新元素到容器
     container.appendChild(fragment);
+    
+    // 初始化瀑布流效果（如果需要）
+    initWaterfallLayout();
+}
+
+// 初始化瀑布流布局
+function initWaterfallLayout() {
+    const container = document.getElementById('douban-results');
+    if (!container) return;
+    
+    // 简单的瀑布流布局调整
+    const cards = container.querySelectorAll('.break-inside-avoid');
+    
+    // 重置所有卡片的最小高度
+    cards.forEach(card => {
+        card.style.minHeight = 'auto';
+    });
 }
 
 // 重置到首页
@@ -851,4 +845,3 @@ function resetTagsToDefault() {
     
     showToast('已恢复默认标签', 'success');
 }
-滚动自动加载
