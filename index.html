@@ -127,7 +127,21 @@
             <div class="p-3 bg-[#151515] rounded-lg shadow-inner">
                 <label class="block text-sm font-medium text-gray-400 mb-3 border-b border-[#333] pb-1">功能开关</label>
                 
-
+                <!-- 黄色内容过滤开关 -->
+                <div class="flex flex-col mb-3 pb-3 border-b border-[#222] relative">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="text-sm font-medium text-gray-400">黄色内容过滤</label>
+                            <p class="text-xs text-gray-500 mt-1 filter-description">过滤"伦理片"等黄色内容</p>
+                        </div>
+                        <div class="relative inline-block w-12 align-middle select-none">
+                            <input type="checkbox" id="yellowFilterToggle" class="opacity-0 absolute w-full h-full cursor-pointer z-10">
+                            <div class="toggle-bg bg-[#333] w-12 h-6 rounded-full transition-colors duration-300 ease-in-out"></div>
+                            <div class="toggle-dot absolute w-5 h-5 bg-white rounded-full top-0.5 left-0.5 transition-transform duration-300 ease-in-out"></div>
+                        </div>
+                    </div>
+                    <!-- 警告提示将在这里动态插入 -->
+                </div>
                 
                 <!-- 广告过滤开关 -->
                 <div class="flex items-center justify-between mb-3 pb-3 border-b border-[#222]">
