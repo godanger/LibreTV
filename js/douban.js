@@ -632,11 +632,10 @@ function renderDoubanCards(data, container, clear = true) {
                         loading="lazy" referrerpolicy="no-referrer">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="absolute bottom-2 left-2 bg-black/80 text-white text-xs px-2 py-1 rounded-sm backdrop-blur-sm">
-                        <a href="${item.url}" target="_blank" rel="noopener noreferrer" title="在豆瓣查看" onclick="event.stopPropagation();"><span class="text-yellow-400">★</span> ${safeRate}</a>
+                        <span class="text-yellow-400">★</span> ${safeRate}
                     </div>
-                    <div class="absolute top-1 right-1  text-white text-xs rounded-sm backdrop-blur-sm  transition-colors">
-                                                ${item.is_new ? '<span class="inline-block bg-red-500 text-white px-1.5 py-0.5 rounded text-xs mr-1">新</span>' : ''}
-                        <span>${item.episodes_info || ''}</span>
+                    <div class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded-sm backdrop-blur-sm hover:bg-[#333] transition-colors">
+                        <a href="${item.url}" target="_blank" rel="noopener noreferrer" title="在豆瓣查看" onclick="event.stopPropagation();"> ✙ </a> 
                     </div>
                 </div>
                 <div class="p-3 flex-1 bg-gradient-to-b from-[#111] to-[#0a0a0a]">
@@ -645,7 +644,10 @@ function renderDoubanCards(data, container, clear = true) {
                             title="${safeTitle}">
                         ${safeTitle}
                     </button>
-
+                    <div class="mt-2 text-xs text-gray-400 text-left">
+                        ${item.is_new ? '<span class="inline-block bg-red-500 text-white px-1.5 py-0.5 rounded text-xs mr-1">新</span>' : ''}
+                        <span>${item.episodes_info || ''}</span>
+                    </div>
                 </div>
             `;
             
@@ -707,7 +709,7 @@ function showTagManageModal() {
                                 <span>${tag}</span>
                                 ${canDelete ? 
                                     `<button class="delete-tag-btn text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" 
-                                        data-tag="${tag}">?</button>` : 
+                                        data-tag="${tag}">✖</button>` : 
                                     `<span class="text-gray-500 text-xs italic opacity-0 group-hover:opacity-100">必需</span>`
                                 }
                             </div>
