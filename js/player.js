@@ -583,70 +583,91 @@ function initPlayer(videoUrl) {
         }
     });
 
-    // artplayer 没有 'fullscreenWeb:enter', 'fullscreenWeb:exit' 等事件
-    // 所以原控制栏隐藏代码并没有起作用
-    // 实际起作用的是 artplayer 默认行为，它支持自动隐藏工具栏
-    // 但有一个 bug： 在副屏全屏时，鼠标移出副屏后不会自动隐藏工具栏
-    // 下面进一并重构和修复：
+    // 自动隐藏工具栏的逻辑
     let hideTimer;
+    const HIDE_DELAY = 2000; // 2秒后隐藏
 
-    // 隐藏控制栏
+    // 创建鼠标跟踪状态
+    let isMouseActive = false;
+    let isMouseOverPlayer = false;
+
     function hideControls() {
-        if (art && art.controls) {
-            art.controls.show = false;
-        }
+        if (isMouseActive || !isMouseOverPlayer) return;
+        art.controls.classList.add('art-controls-hide');
     }
 
-    // 重置计时器，计时器超时时间与 artplayer 保持一致
+    function showControls() {
+        art.controls.classList.remove('art-controls-hide');
+    }
+
     function resetHideTimer() {
         clearTimeout(hideTimer);
+        showControls();
+        isMouseActive = true;
+
         hideTimer = setTimeout(() => {
+            isMouseActive = false;
             hideControls();
-        }, Artplayer.CONTROL_HIDE_TIME);
+        }, HIDE_DELAY);
     }
+
+    // 监听全屏状态变化
+    art.on('fullscreenWeb:enter', () => {
+        // 添加全局事件监听
+        document.addEventListener('mousemove', resetHideTimer);
+        document.addEventListener('mouseleave', handleMouseLeave);
+        document.addEventListener('mouseenter', handleMouseEnter);
+
+        // 添加播放器区域事件
+        art.player.addEventListener('mouseenter', () => isMouseOverPlayer = true);
+        art.player.addEventListener('mouseleave', () => isMouseOverPlayer = false);
+
+        // 初始状态
+        isMouseOverPlayer = true;
+        resetHideTimer();
+    });
+
+    art.on('fullscreenWeb:exit', () => {
+        // 移除所有事件监听
+        document.removeEventListener('mousemove', resetHideTimer);
+        document.removeEventListener('mouseleave', handleMouseLeave);
+        document.removeEventListener('mouseenter', handleMouseEnter);
+
+        art.player.removeEventListener('mouseenter', () => isMouseOverPlayer = true);
+        art.player.removeEventListener('mouseleave', () => isMouseOverPlayer = false);
+
+        // 清除定时器并显示控件
+        clearTimeout(hideTimer);
+        showControls();
+    });
 
     // 处理鼠标离开浏览器窗口
-    function handleMouseOut(e) {
-        if (e && !e.relatedTarget) {
-            resetHideTimer();
-        }
+    function handleMouseLeave() {
+        // 立即隐藏工具栏
+        hideControls();
+        clearTimeout(hideTimer);
     }
-
-    // 全屏状态切换时注册/移除 mouseout 事件，监听鼠标移出屏幕事件
-    // 从而对播放器状态栏进行隐藏倒计时
-    function handleFullScreen(isFullScreen, isWeb) {
-        if (isFullScreen) {
-            document.addEventListener('mouseout', handleMouseOut);
-        } else {
-            document.removeEventListener('mouseout', handleMouseOut);
-            // 退出全屏时清理计时器
-            clearTimeout(hideTimer);
-        }
-
-        if (!isWeb) {
-            if (window.screen.orientation && window.screen.orientation.lock) {
-                window.screen.orientation.lock('landscape')
-                    .then(() => {
-                    })
-                    .catch((error) => {
-                    });
-            }
-        }
+    
+    // 处理鼠标返回浏览器窗口
+    function handleMouseEnter() {
+        isMouseActive = true;
+        resetHideTimer();
     }
 
     // 播放器加载完成后初始隐藏工具栏
     art.on('ready', () => {
-        hideControls();
-    });
-
-    // 全屏 Web 模式处理
-    art.on('fullscreenWeb', function (isFullScreen) {
-        handleFullScreen(isFullScreen, true);
+        art.controls.classList.add('art-controls-hide');
     });
 
     // 全屏模式处理
-    art.on('fullscreen', function (isFullScreen) {
-        handleFullScreen(isFullScreen, false);
+    art.on('fullscreen', function () {
+        if (window.screen.orientation && window.screen.orientation.lock) {
+            window.screen.orientation.lock('landscape')
+                .then(() => {
+                })
+                .catch((error) => {
+                });
+        }
     });
 
     art.on('video:loadedmetadata', function() {
@@ -1451,10 +1472,8 @@ function renderResourceInfoBar() {
         <span class="resource-info-bar-videos">-</span>
       </div>
       <button class="resource-switch-btn flex" id="switchResourceBtn" onclick="showSwitchResourceModal()">
-<span class="resource-switch-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 30 30" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                </svg>
+        <span class="resource-switch-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4v16m0 0l-6-6m6 6l6-6" stroke="#a67c2d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
         切换资源
       </button>
@@ -1480,121 +1499,11 @@ function renderResourceInfoBar() {
       </div>
       <button class="resource-switch-btn flex" id="switchResourceBtn" onclick="showSwitchResourceModal()">
         <span class="resource-switch-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                </svg>
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4v16m0 0l-6-6m6 6l6-6" stroke="#a67c2d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </span>
         切换资源
       </button>
     `;
-}
-
-// 测试视频源速率的函数
-async function testVideoSourceSpeed(sourceKey, vodId) {
-    try {
-        const startTime = performance.now();
-        
-        // 构建API参数
-        let apiParams = '';
-        if (sourceKey.startsWith('custom_')) {
-            const customIndex = sourceKey.replace('custom_', '');
-            const customApi = getCustomApiInfo(customIndex);
-            if (!customApi) {
-                return { speed: -1, error: 'API配置无效' };
-            }
-            if (customApi.detail) {
-                apiParams = '&customApi=' + encodeURIComponent(customApi.url) + '&customDetail=' + encodeURIComponent(customApi.detail) + '&source=custom';
-            } else {
-                apiParams = '&customApi=' + encodeURIComponent(customApi.url) + '&source=custom';
-            }
-        } else {
-            apiParams = '&source=' + sourceKey;
-        }
-        
-        // 添加时间戳防止缓存
-        const timestamp = new Date().getTime();
-        const cacheBuster = `&_t=${timestamp}`;
-        
-        // 获取视频详情
-        const response = await fetch(`/api/detail?id=${encodeURIComponent(vodId)}${apiParams}${cacheBuster}`, {
-            method: 'GET',
-            cache: 'no-cache'
-        });
-        
-        if (!response.ok) {
-            return { speed: -1, error: '获取失败' };
-        }
-        
-        const data = await response.json();
-        
-        if (!data.episodes || data.episodes.length === 0) {
-            return { speed: -1, error: '无播放源' };
-        }
-        
-        // 测试第一个播放链接的响应速度
-        const firstEpisodeUrl = data.episodes[0];
-        if (!firstEpisodeUrl) {
-            return { speed: -1, error: '链接无效' };
-        }
-        
-        // 测试视频链接响应时间
-        const videoTestStart = performance.now();
-        try {
-            const videoResponse = await fetch(firstEpisodeUrl, {
-                method: 'HEAD',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                signal: AbortSignal.timeout(5000) // 5秒超时
-            });
-            
-            const videoTestEnd = performance.now();
-            const totalTime = videoTestEnd - startTime;
-            
-            // 返回总响应时间（毫秒）
-            return { 
-                speed: Math.round(totalTime),
-                episodes: data.episodes.length,
-                error: null 
-            };
-        } catch (videoError) {
-            // 如果视频链接测试失败，只返回API响应时间
-            const apiTime = performance.now() - startTime;
-            return { 
-                speed: Math.round(apiTime),
-                episodes: data.episodes.length,
-                error: null,
-                note: 'API响应' 
-            };
-        }
-        
-    } catch (error) {
-        return { 
-            speed: -1, 
-            error: error.name === 'AbortError' ? '超时' : '测试失败' 
-        };
-    }
-}
-
-// 格式化速度显示
-function formatSpeedDisplay(speedResult) {
-    if (speedResult.speed === -1) {
-        return `<span class="speed-indicator error">❌ ${speedResult.error}</span>`;
-    }
-    
-    const speed = speedResult.speed;
-    let className = 'speed-indicator good';
-    let icon = '🟢';
-    
-    if (speed > 2000) {
-        className = 'speed-indicator poor';
-        icon = '🔴';
-    } else if (speed > 1000) {
-        className = 'speed-indicator medium';
-        icon = '🟡';
-    }
-    
-    const note = speedResult.note ? ` (${speedResult.note})` : '';
-    return `<span class="${className}">${icon} ${speed}ms${note}</span>`;
 }
 
 async function showSwitchResourceModal() {
@@ -1637,17 +1546,6 @@ async function showSwitchResourceModal() {
         allResults[opt.key] = result;
     }));
 
-    // 更新状态显示：开始速率测试
-    modalContent.innerHTML = '<div style="text-align:center;padding:20px;color:#aaa;grid-column:1/-1;">正在测试各资源速率...</div>';
-
-    // 同时测试所有资源的速率
-    const speedResults = {};
-    await Promise.all(Object.entries(allResults).map(async ([sourceKey, result]) => {
-        if (result) {
-            speedResults[sourceKey] = await testVideoSourceSpeed(sourceKey, result.vod_id);
-        }
-    }));
-
     // 对结果进行排序
     const sortedResults = Object.entries(allResults).sort(([keyA, resultA], [keyB, resultB]) => {
         // 当前播放的源放在最前面
@@ -1657,19 +1555,15 @@ async function showSwitchResourceModal() {
         if (isCurrentA && !isCurrentB) return -1;
         if (!isCurrentA && isCurrentB) return 1;
         
-        // 其余按照速度排序，速度快的在前面（速度为-1表示失败，排到最后）
-        const speedA = speedResults[keyA]?.speed || 99999;
-        const speedB = speedResults[keyB]?.speed || 99999;
+        // 其余按照 selectedAPIs 的顺序排列
+        const indexA = selectedAPIs.indexOf(keyA);
+        const indexB = selectedAPIs.indexOf(keyB);
         
-        if (speedA === -1 && speedB !== -1) return 1;
-        if (speedA !== -1 && speedB === -1) return -1;
-        if (speedA === -1 && speedB === -1) return 0;
-        
-        return speedA - speedB;
+        return indexA - indexB;
     });
 
     // 渲染资源列表
-    let html = '<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4">';
+    let html = '<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 p-4">';
     
     for (const [sourceKey, result] of sortedResults) {
         if (!result) continue;
@@ -1677,32 +1571,28 @@ async function showSwitchResourceModal() {
         // 修复 isCurrentSource 判断，确保类型一致
         const isCurrentSource = String(sourceKey) === String(currentSourceCode) && String(result.vod_id) === String(currentVideoId);
         const sourceName = resourceOptions.find(opt => opt.key === sourceKey)?.name || '未知资源';
-        const speedResult = speedResults[sourceKey] || { speed: -1, error: '未测试' };
+        const coverUrl = result.vod_pic || '';
+        const hasCover = coverUrl && (coverUrl.startsWith('http://') || coverUrl.startsWith('https://'));
+        const localPlaceholder = 'image/nomedia.png';
+        const proxiedCoverUrl = hasCover ? PROXY_URL + encodeURIComponent(coverUrl) : '';
         
         html += `
             <div class="relative group ${isCurrentSource ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:scale-105 transition-transform'}" 
                  ${!isCurrentSource ? `onclick="switchToResource('${sourceKey}', '${result.vod_id}')"` : ''}>
-                <div class="aspect-[2/3] rounded-lg overflow-hidden bg-gray-800 relative">
-                    <img src="${result.vod_pic}" 
+                <div class="aspect-[2/3] rounded-lg overflow-hidden bg-gray-800">
+                    <img src="${hasCover ? coverUrl : localPlaceholder}" 
                          alt="${result.vod_name}"
                          class="w-full h-full object-cover"
-                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjY2IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHJlY3QgeD0iMyIgeT0iMyIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4IiByeD0iMiIgcnk9IjIiPjwvcmVjdD48cGF0aCBkPSJNMjEgMTV2NGEyIDIgMCAwIDEtMiAySDVhMiAyIDAgMCAxLTItMnYtNCI+PC9wYXRoPjxwb2x5bGluZSBwb2ludHM9IjE3IDggMTIgMyA3IDgiPjwvcG9seWxpbmU+PHBhdGggZD0iTTEyIDN2MTIiPjwvcGF0aD48L3N2Zz4='">
-                    
-                    <!-- 速率显示在图片右上角 -->
-                    <div class="absolute top-1 right-1 speed-badge bg-black bg-opacity-75">
-                        ${formatSpeedDisplay(speedResult)}
-                    </div>
+                         onerror="this.onerror=null; this.src='${proxiedCoverUrl}'; this.onerror=function(){this.src='${localPlaceholder}'};"
+                         loading="lazy" referrerpolicy="no-referrer">
                 </div>
-                <div class="mt-2">
+                <div class="mt-1">
                     <div class="text-xs font-medium text-gray-200 truncate">${result.vod_name}</div>
-                    <div class="text-[10px] text-gray-400 truncate">${sourceName}</div>
-                    <div class="text-[10px] text-gray-500 mt-1">
-                        ${speedResult.episodes ? `${speedResult.episodes}集` : ''}
-                    </div>
+                    <div class="text-[10px] text-gray-400">${sourceName}</div>
                 </div>
                 ${isCurrentSource ? `
                     <div class="absolute inset-0 flex items-center justify-center">
-                        <div class="bg-blue-600 bg-opacity-75 rounded-lg px-2 py-0.5 text-xs text-white font-medium">
+                        <div class="bg-black bg-opacity-50 rounded-lg px-2 py-0.5 text-xs text-white">
                             当前播放
                         </div>
                     </div>
