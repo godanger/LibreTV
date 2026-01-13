@@ -686,7 +686,7 @@ function showTagManageModal() {
     
     // 模态框内容
     modal.innerHTML = `
-        <div class="bg-[#191919] rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto relative">
+        <div class="bg-[#111827] rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto relative">
             <button id="closeTagModal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">&times;</button>
             
             <h3 class="text-xl font-bold text-white mb-4">标签管理 (${isMovie ? '电影' : '电视剧'})</h3>
@@ -707,7 +707,7 @@ function showTagManageModal() {
                                 <span>${tag}</span>
                                 ${canDelete ? 
                                     `<button class="delete-tag-btn text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" 
-                                        data-tag="${tag}">?</button>` : 
+                                        data-tag="${tag}">✕</button>` : 
                                     `<span class="text-gray-500 text-xs italic opacity-0 group-hover:opacity-100">必需</span>`
                                 }
                             </div>
