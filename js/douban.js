@@ -524,7 +524,6 @@ async function fetchDoubanData(url) {
     
     // 设置请求选项，包括信号和头部
     const fetchOptions = {
-        method: 'GET',  // 明确指定GET方法
         signal: controller.signal,
         headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
