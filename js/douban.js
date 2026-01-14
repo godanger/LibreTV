@@ -529,10 +529,20 @@ async function fetchDoubanData(url) {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
             'Referer': 'https://movie.douban.com/',
             'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, br'
+        },
+        // 添加重试和超时配置
+        cf: {
+            timeout: 15000, // Cloudflare Workers层面的15秒超时
+            retries: {
+                retries: 3,
+                maxTimeout: 3000
+            }
         }
     };
 
-    try {
+   try {
         // 添加鉴权参数到代理URL
         const proxiedUrl = await window.ProxyAuth?.addAuthToProxyUrl ? 
             await window.ProxyAuth.addAuthToProxyUrl(PROXY_URL + encodeURIComponent(url)) :
