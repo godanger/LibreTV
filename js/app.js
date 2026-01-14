@@ -964,7 +964,7 @@ async function showDetails(id, vod_name, sourceCode) {
                         </button>
                         <span class="text-gray-400 text-sm">共 ${data.episodes.length} 集</span>
                     </div>
-                    <button onclick="copyLinks()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition-colors">
+                    <button onclick="copyLinks()" class="px-3 py-1.5 bg-[#161b22] hover:bg-[#111827] border border-[#1f2937] text-[#D3E1F4] rounded text-sm transition-colors">
                         复制链接
                     </button>
                 </div>
