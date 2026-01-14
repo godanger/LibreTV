@@ -628,7 +628,7 @@ function renderDoubanCards(data, container, clear = true) {
                 <div class="relative w-full aspect-[2/3] overflow-hidden cursor-pointer" onclick="fillAndSearchWithDouban('${safeTitle}')">
                     <img src="https://corss.dpdns.org/proxy.php?url=${proxiedCoverUrl}" alt="${safeTitle}" 
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        onerror="this.onerror=null; this.src='${originalCoverUrl}'; this.classList.add('object-contain');"
+                        onerror="this.onerror=null; this.src='https://corss.dpdns.org/proxy.php?url=${originalCoverUrl}'; this.classList.add('object-contain');"
                         loading="lazy" referrerpolicy="no-referrer">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="absolute bottom-2 left-2 bg-black/80 text-white text-xs px-2 py-1 rounded-sm backdrop-blur-sm">
