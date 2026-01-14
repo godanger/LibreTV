@@ -630,7 +630,7 @@ function renderDoubanCards(data, container, clear = true) {
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         onerror="this.onerror=null; this.src='https://corss.dpdns.org/proxy.php?url=${originalCoverUrl}'; this.classList.add('object-contain');"
                         loading="lazy" referrerpolicy="no-referrer">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="absolute bottom-2 left-2 bg-black/80 text-white text-xs px-2 py-1 rounded-sm backdrop-blur-sm">
                         <a href="${item.url}" target="_blank" rel="noopener noreferrer" title="在豆瓣查看" onclick="event.stopPropagation();"><span class="text-yellow-400">★</span> ${safeRate}</a>
                     </div>
