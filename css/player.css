@@ -3,6 +3,7 @@ body, html {
     padding: 0;
     width: 100%;
     height: 100%;
+    background-color: #1c1d21;
     color: #D3E1F4;
     padding-top: 37px;
 }
@@ -341,7 +342,6 @@ input:checked + .slider:before {
 }
 
 .resource-switch-btn {
-    background: #161b22;
     align-items: center;
     background: none;
     border: none;
