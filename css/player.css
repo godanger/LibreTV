@@ -342,6 +342,7 @@ input:checked + .slider:before {
 }
 
 .resource-switch-btn {
+    background: #161b22;
     align-items: center;
     background: none;
     border: none;
