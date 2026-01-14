@@ -686,7 +686,7 @@ function showTagManageModal() {
     
     // 模态框内容
     modal.innerHTML = `
-        <div class=" bg-[#111]  rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto relative">
+        <div class=" bg-[#161b22]  rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto relative">
             <button id="closeTagModal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">&times;</button>
             
             <h3 class="text-xl font-bold text-white mb-4">标签管理 (${isMovie ? '电影' : '电视剧'})</h3>
