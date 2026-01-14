@@ -686,7 +686,7 @@ function showTagManageModal() {
     
     // 模态框内容
     modal.innerHTML = `
-        <div class="bg-gray-700 rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto relative">
+        <div class=" bg-[#111]  rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto relative">
             <button id="closeTagModal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">&times;</button>
             
             <h3 class="text-xl font-bold text-white mb-4">标签管理 (${isMovie ? '电影' : '电视剧'})</h3>
@@ -694,7 +694,7 @@ function showTagManageModal() {
             <div class="mb-4">
                 <div class="flex justify-between items-center mb-2">
                     <h4 class="text-lg font-medium text-gray-300">标签列表</h4>
-                    <button id="resetTagsBtn" class="text-xs px-2 py-1 bg-[#111827] text-white rounded">
+                    <button id="resetTagsBtn" class="text-xs px-2 py-1 bg-[#111827]  hover:bg-[#1f2937]  text-white rounded">
                         恢复默认标签
                     </button>
                 </div>
