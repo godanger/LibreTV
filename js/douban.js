@@ -529,32 +529,64 @@ async function fetchDoubanData(url) {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
             'Referer': 'https://movie.douban.com/',
             'Accept': 'application/json, text/plain, */*',
-        }
+        },
+        // 添加重试策略
+        retries: 2,
+        retryDelay: 1000
+    };
+
+    // 清理超时并确保可取消
+    const cleanup = () => {
+        clearTimeout(timeoutId);
     };
 
     try {
         // 添加鉴权参数到代理URL
-        const proxiedUrl = await window.ProxyAuth?.addAuthToProxyUrl ? 
+        const proxiedUrl = window.ProxyAuth?.addAuthToProxyUrl ? 
             await window.ProxyAuth.addAuthToProxyUrl(PROXY_URL + encodeURIComponent(url)) :
             PROXY_URL + encodeURIComponent(url);
             
-        // 尝试直接访问（豆瓣API可能允许部分CORS请求）
         const response = await fetch(proxiedUrl, fetchOptions);
-        clearTimeout(timeoutId);
+        cleanup();
         
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            const errorText = await response.text().catch(() => 'No error details');
+            throw new Error(`HTTP error! Status: ${response.status}, Details: ${errorText}`);
+        }
+        
+        // 验证返回的是有效的JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error(`Expected JSON but got: ${contentType}`);
         }
         
         return await response.json();
     } catch (err) {
+        cleanup(); // 确保清理超时
+        
+        // 如果是AbortError（超时），提供更清晰的错误信息
+        if (err.name === 'AbortError') {
+            console.error("豆瓣 API 请求超时（10秒）");
+            throw new Error('请求超时，请检查网络连接或稍后重试');
+        }
+        
         console.error("豆瓣 API 请求失败（直接代理）：", err);
         
-        // 失败后尝试备用方法：作为备选
-        const fallbackUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-        
+        // 备用方法：使用allorigins
         try {
-            const fallbackResponse = await fetch(fallbackUrl);
+            const fallbackUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+            const fallbackController = new AbortController();
+            const fallbackTimeout = setTimeout(() => fallbackController.abort(), 10000);
+            
+            const fallbackOptions = {
+                signal: fallbackController.signal,
+                headers: {
+                    'Accept': 'application/json',
+                }
+            };
+            
+            const fallbackResponse = await fetch(fallbackUrl, fallbackOptions);
+            clearTimeout(fallbackTimeout);
             
             if (!fallbackResponse.ok) {
                 throw new Error(`备用API请求失败! 状态: ${fallbackResponse.status}`);
@@ -564,14 +596,32 @@ async function fetchDoubanData(url) {
             
             // 解析原始内容
             if (data && data.contents) {
-                return JSON.parse(data.contents);
+                try {
+                    return JSON.parse(data.contents);
+                } catch (parseError) {
+                    console.error("解析备用API返回的JSON失败：", parseError);
+                    throw new Error("API返回的数据格式不正确");
+                }
+            } else if (data && data.status && data.status.http_code !== 200) {
+                throw new Error(`备用API错误: ${data.status.message || 'Unknown error'}`);
             } else {
                 throw new Error("无法获取有效数据");
             }
         } catch (fallbackErr) {
             console.error("豆瓣 API 备用请求也失败：", fallbackErr);
-            throw fallbackErr; // 向上抛出错误，让调用者处理
+            
+            // 提供更友好的错误信息
+            const friendlyError = new Error(
+                fallbackErr.name === 'AbortError' 
+                    ? '备用请求超时，请稍后重试' 
+                    : '无法获取豆瓣数据，请检查网络连接'
+            );
+            friendlyError.originalError = fallbackErr;
+            throw friendlyError;
         }
+    } finally {
+        // 最终清理，确保不会留下未清理的定时器
+        cleanup();
     }
 }
 
