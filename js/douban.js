@@ -532,7 +532,7 @@ async function fetchDoubanData(url) {
         }
     };
 
-   try {
+    try {
         // 添加鉴权参数到代理URL
         const proxiedUrl = await window.ProxyAuth?.addAuthToProxyUrl ? 
             await window.ProxyAuth.addAuthToProxyUrl(PROXY_URL + encodeURIComponent(url)) :
