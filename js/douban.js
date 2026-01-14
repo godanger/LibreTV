@@ -686,7 +686,7 @@ function showTagManageModal() {
     
     // 模态框内容
     modal.innerHTML = `
-        <div class=" bg-[#161b22]  rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto relative">
+        <div class=" bg-[#1c1d21] rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto relative">
             <button id="closeTagModal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">&times;</button>
             
             <h3 class="text-xl font-bold text-white mb-4">标签管理 (${isMovie ? '电影' : '电视剧'})</h3>
@@ -703,7 +703,7 @@ function showTagManageModal() {
                         // "热门"标签不能删除
                         const canDelete = tag !== '热门';
                         return `
-                            <div class="bg-[#161b22] text-gray-300 py-1.5 px-3 rounded text-sm font-medium flex justify-between items-center group">
+                            <div class=" bg-gray-800  hover:bg-gray-600  text-gray-300 py-1.5 px-3 rounded text-sm font-medium flex justify-between items-center group">
                                 <span>${tag}</span>
                                 ${canDelete ? 
                                     `<button class="delete-tag-btn text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" 
