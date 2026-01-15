@@ -738,7 +738,7 @@ async function search() {
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;');
             const sourceInfo = item.source_name ?
-                `<span class="opacity-30 group-hover:opacity-100  text-xs px-1.5 py-0.5 rounded-full">${item.source_name}</span>` : '';
+                `<span class="opacity-30 group-hover:opacity-100  bg-gray-900 text-xs px-1.5 py-0.5 rounded-full">${item.source_name}</span>` : '';
             const sourceCode = item.source_code || '';
 
             // 添加API URL属性，用于详情获取
