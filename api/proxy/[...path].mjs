@@ -171,6 +171,16 @@ async function fetchContentWithType(targetUrl, requestHeaders) {
         const content = await response.text();
         const contentType = response.headers.get('content-type') || '';
         logDebug(`请求成功: ${targetUrl}, Content-Type: ${contentType}, 内容长度: ${content.length}`);
+        // 在 fetchContentWithType 函数末尾，return 前添加：
+console.log('[DEBUG-IMG] Target URL:', targetUrl);
+console.log('[DEBUG-IMG] Content-Type:', contentType);
+console.log('[DEBUG-IMG] Content length:', content.length);
+console.log('[DEBUG-IMG] First 100 chars:', content.substring(0, 100));
+
+// 如果是图片类型，可以额外输出最后几个字符（可选）
+if (contentType.includes('image/')) {
+    console.log('[DEBUG-IMG] Last 20 chars (should be binary end):', content.slice(-20));
+}
         // 返回结果
         return { content, contentType, responseHeaders: response.headers };
 
