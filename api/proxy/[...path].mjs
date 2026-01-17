@@ -52,31 +52,28 @@ function logDebug(message) {
  * @param {string} encodedPath - URL 编码后的路径部分 (例如 "https%3A%2F%2F...")
  * @returns {string|null} 解码后的目标 URL，如果无效则返回 null。
  */
-function getTargetUrlFromPath(pathname) {
-    // Cloudflare Pages [[path]] 会捕获 /proxy/ 后面的所有路径部分（不含查询字符串）
-    // 所以 pathname 应该是 /proxy/encoded-target-url
-    const parts = pathname.split('/').filter(Boolean); // ['proxy', 'https%3A%2F%2F...', ...]
-
-    if (parts.length < 2 || parts[0] !== 'proxy') {
+function getTargetUrlFromPath(encodedPath) {
+    if (!encodedPath) {
+        logDebug("getTargetUrlFromPath 收到空路径。");
         return null;
     }
-
-    // 取 'proxy' 之后的所有部分，重新组合成 encoded 字符串
-    const encodedParts = parts.slice(1);
-    let encodedUrl = encodedParts.join('/');
-
     try {
-        const decoded = decodeURIComponent(encodedUrl);
-        if (decoded.startsWith('http://') || decoded.startsWith('https://')) {
-            return decoded;
+        const decodedUrl = decodeURIComponent(encodedPath);
+        // 基础检查，看是否像一个 HTTP/HTTPS URL
+        if (decodedUrl.match(/^https?:\/\/.+/i)) {
+            return decodedUrl;
+        } else {
+            logDebug(`无效的解码 URL 格式: ${decodedUrl}`);
+            // 备选检查：原始路径是否未编码但看起来像 URL？
+            if (encodedPath.match(/^https?:\/\/.+/i)) {
+                logDebug(`警告: 路径未编码但看起来像 URL: ${encodedPath}`);
+                return encodedPath;
+            }
+            return null;
         }
-        // 如果解码失败或不是 URL，尝试用原始 encodedUrl
-        if (encodedUrl.startsWith('http%3A%2F%2F') || encodedUrl.startsWith('https%3A%2F%2F')) {
-            return decodeURIComponent(encodedUrl); // 强制再试一次
-        }
-        return null;
-    } catch (err) {
-        console.error('URL decode error:', err);
+    } catch (e) {
+        // 捕获解码错误 (例如格式错误的 URI)
+        logDebug(`解码目标 URL 出错: ${encodedPath} - ${e.message}`);
         return null;
     }
 }
@@ -171,35 +168,6 @@ async function fetchContentWithType(targetUrl, requestHeaders) {
         const content = await response.text();
         const contentType = response.headers.get('content-type') || '';
         logDebug(`请求成功: ${targetUrl}, Content-Type: ${contentType}, 内容长度: ${content.length}`);
-// 示例位置：在 fetch 后、修改 responseHeaders 前
-const response = await fetch(targetUrlStr, fetchOptions);
-
-// ── 新增调试日志 ──
-console.log('[DEBUG-BODY] Target URL:', targetUrlStr);
-console.log('[DEBUG-BODY] Status:', response.status);
-console.log('[DEBUG-BODY] Content-Type:', response.headers.get('Content-Type') || 'unknown');
-console.log('[DEBUG-BODY] Content-Length:', response.headers.get('Content-Length') || 'unknown');
-
-// 读取 body（用 text() 方便查看）
-let bodyText;
-try {
-    bodyText = await response.text();
-} catch (e) {
-    bodyText = '[读取 body 失败] ' + e.message;
-}
-
-console.log('[DEBUG-BODY] Body length:', bodyText.length);
-console.log('[DEBUG-BODY] Body first 300 chars:', bodyText.substring(0, 300));
-
-// 如果是图片数据，输出前 20 字节的 hex（JPEG 开头通常 ff d8 ff）
-if (bodyText.length > 20) {
-    const firstBytes = new Uint8Array(bodyText.slice(0, 20).split('').map(c => c.charCodeAt(0)));
-    const hex = Array.from(firstBytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
-    console.log('[DEBUG-BODY] First 20 bytes (hex):', hex);
-}
-
-// 注意：这里读取了 body，所以需要重新构造 response（因为 body 只能读一次）
-const newResponse = new Response(bodyText, response);
         // 返回结果
         return { content, contentType, responseHeaders: response.headers };
 
@@ -341,13 +309,6 @@ async function validateAuth(req) {
     
     // 获取服务器端密码哈希
     const serverPassword = process.env.PASSWORD;
-    // ── 新增调试日志 ──
-    console.log('[AUTH-DEBUG] serverPassword exists:', !!serverPassword);
-    console.log('[AUTH-DEBUG] serverPassword length:', serverPassword ? serverPassword.length : 'undefined');
-    if (serverPassword) {
-        console.log('[AUTH-DEBUG] serverPassword first 5 chars:', serverPassword.substring(0,5));
-        console.log('[AUTH-DEBUG] serverPassword last 5 chars:', serverPassword.slice(-5));
-    }
     if (!serverPassword) {
         console.error('服务器未设置 PASSWORD 环境变量，代理访问被拒绝');
         return false;
