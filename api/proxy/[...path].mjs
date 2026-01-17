@@ -312,6 +312,13 @@ async function validateAuth(req) {
     
     // 获取服务器端密码哈希
     const serverPassword = process.env.PASSWORD;
+    // ── 新增调试日志 ──
+    console.log('[AUTH-DEBUG] serverPassword exists:', !!serverPassword);
+    console.log('[AUTH-DEBUG] serverPassword length:', serverPassword ? serverPassword.length : 'undefined');
+    if (serverPassword) {
+        console.log('[AUTH-DEBUG] serverPassword first 5 chars:', serverPassword.substring(0,5));
+        console.log('[AUTH-DEBUG] serverPassword last 5 chars:', serverPassword.slice(-5));
+    }
     if (!serverPassword) {
         console.error('服务器未设置 PASSWORD 环境变量，代理访问被拒绝');
         return false;
