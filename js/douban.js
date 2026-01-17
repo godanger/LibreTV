@@ -631,7 +631,9 @@ function renderDoubanCards(data, container, clear = true) {
             const originalCoverUrl = item.cover;
             
             // 2. 也准备代理URL作为备选
-            const proxiedCoverUrl = PROXY_URL + encodeURIComponent(originalCoverUrl);
+            const timestamp = Date.now();
+            const authHash = "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92"; // ← 替换成你上面算出来的
+            const proxiedCoverUrl = `${PROXY_URL}${encodeURIComponent(originalCoverUrl)}?auth=${authHash}&t=${timestamp}`;
             
             // 创建瀑布流卡片，高度自适应图片
             card.innerHTML = `
