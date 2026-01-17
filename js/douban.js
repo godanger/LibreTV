@@ -516,7 +516,16 @@ function removeLoadingIndicators(container) {
         container.removeChild(bottomLoader);
     }
 }
-
+// 随机UA，防封
+function getRandomUA() {
+    const uas = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0',
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+    ];
+    return uas[Math.floor(Math.random() * uas.length)];
+}
 async function fetchDoubanData(url) {
     // 添加超时控制
     const controller = new AbortController();
@@ -526,9 +535,10 @@ async function fetchDoubanData(url) {
     const fetchOptions = {
         signal: controller.signal,
         headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-            'Referer': 'https://movie.douban.com/',
-            'Accept': 'application/json, text/plain, */*',
+        'User-Agent': getRandomUA(),  // 随机UA防检测
+        'Referer': 'https://movie.douban.com/',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'zh-CN,zh;q=0.9',
         }
     };
 
