@@ -171,29 +171,35 @@ async function fetchContentWithType(targetUrl, requestHeaders) {
         const content = await response.text();
         const contentType = response.headers.get('content-type') || '';
         logDebug(`请求成功: ${targetUrl}, Content-Type: ${contentType}, 内容长度: ${content.length}`);
-// 示例：在 fetch 完成后、处理 response 之前添加（根据你的代码结构调整位置）
-
-// 假设你有这样的代码：
+// 示例位置：在 fetch 后、修改 responseHeaders 前
 const response = await fetch(targetUrlStr, fetchOptions);
 
-// 添加调试日志
-console.log('[DEBUG-PROXY] Target URL:', targetUrlStr);
-console.log('[DEBUG-PROXY] Response Status:', response.status);
-console.log('[DEBUG-PROXY] Content-Type:', response.headers.get('Content-Type'));
-console.log('[DEBUG-PROXY] Content-Length:', response.headers.get('Content-Length') || 'unknown');
+// ── 新增调试日志 ──
+console.log('[DEBUG-BODY] Target URL:', targetUrlStr);
+console.log('[DEBUG-BODY] Status:', response.status);
+console.log('[DEBUG-BODY] Content-Type:', response.headers.get('Content-Type') || 'unknown');
+console.log('[DEBUG-BODY] Content-Length:', response.headers.get('Content-Length') || 'unknown');
 
-// 读取 body 并输出前 200 字符（如果是文本）或长度
-const content = await response.text();  // 注意：这里用 text()，因为我们要看内容
-console.log('[DEBUG-PROXY] Body length:', content.length);
-console.log('[DEBUG-PROXY] Body first 200 chars:', content.substring(0, 200));
-
-// 如果是图片，额外检查是否是二进制开头（JPEG 通常以 FF D8 FF 开头）
-if (content.length > 10) {
-    const firstBytes = Array.from(new Uint8Array(content.slice(0, 10).split('').map(c => c.charCodeAt(0))));
-    console.log('[DEBUG-PROXY] First 10 bytes (hex):', firstBytes.map(b => b.toString(16).padStart(2, '0')).join(' '));
+// 读取 body（用 text() 方便查看）
+let bodyText;
+try {
+    bodyText = await response.text();
+} catch (e) {
+    bodyText = '[读取 body 失败] ' + e.message;
 }
 
-// 继续原有逻辑，返回 response
+console.log('[DEBUG-BODY] Body length:', bodyText.length);
+console.log('[DEBUG-BODY] Body first 300 chars:', bodyText.substring(0, 300));
+
+// 如果是图片数据，输出前 20 字节的 hex（JPEG 开头通常 ff d8 ff）
+if (bodyText.length > 20) {
+    const firstBytes = new Uint8Array(bodyText.slice(0, 20).split('').map(c => c.charCodeAt(0)));
+    const hex = Array.from(firstBytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
+    console.log('[DEBUG-BODY] First 20 bytes (hex):', hex);
+}
+
+// 注意：这里读取了 body，所以需要重新构造 response（因为 body 只能读一次）
+const newResponse = new Response(bodyText, response);
         // 返回结果
         return { content, contentType, responseHeaders: response.headers };
 
