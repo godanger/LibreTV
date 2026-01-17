@@ -562,7 +562,7 @@ async function fetchDoubanData(url) {
         console.error("豆瓣 API 请求失败（直接代理）：", err);
         
         // 失败后尝试备用方法：作为备选
-        const fallbackUrl = `https://corss.dpdns.org/proxy.php?url=${encodeURIComponent(url)}`;
+        const fallbackUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
         
         try {
             const fallbackResponse = await fetch(fallbackUrl);
