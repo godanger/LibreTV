@@ -562,7 +562,7 @@ async function fetchDoubanData(url) {
         console.error("豆瓣 API 请求失败（直接代理）：", err);
         
         // 失败后尝试备用方法：作为备选
-        const fallbackUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+        const fallbackUrl = `https://corss.dpdns.org/proxy.php?url=${encodeURIComponent(url)}`;
         
         try {
             const fallbackResponse = await fetch(fallbackUrl);
@@ -637,9 +637,9 @@ function renderDoubanCards(data, container, clear = true) {
             // 创建瀑布流卡片，高度自适应图片
             card.innerHTML = `
                 <div class="relative w-full aspect-[2/3] overflow-hidden cursor-pointer" onclick="fillAndSearchWithDouban('${safeTitle}')">
-                    <img src="${originalCoverUrl}" alt="${safeTitle}" 
+                    <img src="https://corss.dpdns.org/proxy.php?url=${originalCoverUrl}" alt="${safeTitle}" 
                         class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                        onerror="this.onerror=null; this.src='${proxiedCoverUrl}'; this.classList.add('object-contain');"
+                        onerror="this.onerror=null; this.src='https://corss.dpdns.org/proxy.php?url=${originalCoverUrl}'; this.classList.add('object-contain');"
                         loading="lazy" referrerpolicy="no-referrer">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-30 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="absolute bottom-1 left-1 text-white text-xs px-1.5 py-1 rounded-sm backdrop-blur-sm">
