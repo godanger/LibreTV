@@ -4,6 +4,7 @@
 // 在 Cloudflare Pages 设置 -> 函数 -> 环境变量绑定 中设置以下变量:
 // CACHE_TTL (例如 86400)
 // MAX_RECURSION (例如 5)
+// FILTER_DISCONTINUITY (不再需要，设为 false 或移除)
 // USER_AGENTS_JSON (例如 ["UA1", "UA2"]) - JSON 字符串数组
 // DEBUG (例如 false 或 true)
 // PASSWORD (例如 "your_password") - 鉴权密码
@@ -18,46 +19,31 @@ const MEDIA_FILE_EXTENSIONS = [
 const MEDIA_CONTENT_TYPES = ['video/', 'audio/', 'image/'];
 // --- 常量结束 ---
 
-// 允许的域名模式（支持通配符） - 合并自 Worker 代码
-const allowedDomainPatterns = [
-    // 精确匹配的域名
-    'www.cls.cn',
-    'eq.10jqka.com.cn',
-    'movie.douban.com',
-    'boss.juhuoiot.com',
-    'dmp.momi-iot.com',
-    'boss.world-m2m.com',
-    'boss.momi-iot.com',
-   
-    // 通配符模式 - doubanio.com的所有子域名
-    '*.doubanio.com'
-];
-// 需要保留的请求头 - 合并自 Worker
-const ALLOWED_HEADERS = [
-    'accept',
-    'accept-language',
-    'content-type',
-    'authorization',
-    'referer',
-    'user-agent',
-    'x-requested-with',
-    'range' // 支持断点续传
-];
-// 需要设置的请求头 - 合并自 Worker
-const DEFAULT_HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-    'Accept-Encoding': 'gzip, deflate, br'
-};
 
 /**
  * 主要的 Pages Function 处理函数
  * 拦截发往 /proxy/* 的请求
  */
 export async function onRequest(context) {
-    const { request, env, waitUntil } = context; // next 不需要
+    const { request, env, next, waitUntil } = context; // next 和 waitUntil 可能需要
     const url = new URL(request.url);
+
+    // 验证鉴权（主函数调用）
+    const isValidAuth = await validateAuth(request, env);
+    if (!isValidAuth) {
+        return new Response(JSON.stringify({
+            success: false,
+            error: '代理访问未授权：请检查密码配置或鉴权参数'
+        }), { 
+            status: 401,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, HEAD, POST, OPTIONS',
+                'Access-Control-Allow-Headers': '*',
+                'Content-Type': 'application/json'
+            }
+        });
+    }
 
     // --- 从环境变量读取配置 ---
     const DEBUG_ENABLED = (env.DEBUG === 'true');
@@ -83,14 +69,8 @@ export async function onRequest(context) {
     }
     // --- 配置读取结束 ---
 
-    // --- 辅助函数 ---
 
-    // 输出调试日志 (需要设置 DEBUG: true 环境变量)
-    function logDebug(message) {
-        if (DEBUG_ENABLED) {
-            console.log(`[Proxy Func] ${message}`);
-        }
-    }
+    // --- 辅助函数 ---
 
     // 验证代理请求的鉴权
     async function validateAuth(request, env) {
@@ -134,6 +114,25 @@ export async function onRequest(context) {
         }
         
         return true;
+    }
+
+    // 验证鉴权（主函数调用）
+    if (!validateAuth(request, env)) {
+        return new Response('Unauthorized', { 
+            status: 401,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, HEAD, POST, OPTIONS',
+                'Access-Control-Allow-Headers': '*'
+            }
+        });
+    }
+
+    // 输出调试日志 (需要设置 DEBUG: true 环境变量)
+    function logDebug(message) {
+        if (DEBUG_ENABLED) {
+            console.log(`[Proxy Func] ${message}`);
+        }
     }
 
     // 从请求路径中提取目标 URL
@@ -262,10 +261,7 @@ export async function onRequest(context) {
             // 直接请求目标 URL
             logDebug(`开始直接请求: ${targetUrl}`);
             // Cloudflare Functions 的 fetch 默认支持重定向
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15秒超时
-            const response = await fetch(targetUrl, { headers, redirect: 'follow', signal: controller.signal });
-            clearTimeout(timeoutId);
+            const response = await fetch(targetUrl, { headers, redirect: 'follow' });
 
             if (!response.ok) {
                  const errorBody = await response.text().catch(() => '');
@@ -441,7 +437,7 @@ export async function onRequest(context) {
             if (!kvNamespace) throw new Error("KV 命名空间未绑定");
         } catch (e) {
             logDebug(`KV 命名空间 'LIBRETV_PROXY_KV' 访问出错或未绑定: ${e.message}`);
-            kvNamespace = null;
+            kvNamespace = null; // 确保设为 null
         }
 
         if (kvNamespace) {
@@ -525,7 +521,7 @@ export async function onRequest(context) {
                     try { headers = JSON.parse(cachedData.headers); } catch(e){} // 解析头部
                     const contentType = headers['content-type'] || headers['Content-Type'] || '';
 
-                    if (isM3u8Content(content, contentType) ) {
+                    if (isM3u8Content(content, contentType)) {
                         logDebug(`缓存内容是 M3U8，重新处理: ${targetUrl}`);
                         const processedM3u8 = await processM3u8Content(targetUrl, content, 0, env);
                         return createM3u8Response(processedM3u8);
@@ -551,7 +547,7 @@ export async function onRequest(context) {
                  const headersToCache = {};
                  responseHeaders.forEach((value, key) => { headersToCache[key.toLowerCase()] = value; });
                  const cacheValue = { body: content, headers: JSON.stringify(headersToCache) };
-                 // 注意 KV 的写入限制
+                 // 注意 KV 写入限制
                  waitUntil(kvNamespace.put(cacheKey, JSON.stringify(cacheValue), { expirationTtl: CACHE_TTL }));
                  logDebug(`已将原始内容写入缓存: ${targetUrl}`);
             } catch (kvError) {
@@ -594,48 +590,4 @@ export async function onOptions(context) {
             "Access-Control-Max-Age": "86400", // 预检请求结果缓存一天
         },
     });
-}
-
-// 辅助函数：检查域名是否匹配模式
-function isDomainAllowed(hostname) {
-    // 首先检查精确匹配
-    for (const pattern of allowedDomainPatterns) {
-        if (pattern === hostname) {
-            return true;
-        }
-       
-        // 检查通配符模式
-        if (pattern.startsWith('*.')) {
-            const baseDomain = pattern.slice(2); // 移除 '*.' 前缀
-            if (hostname === baseDomain || hostname.endsWith('.' + baseDomain)) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-// 辅助函数：获取合适的Referer
-function getRefererForDomain(hostname) {
-    // 为不同域名设置合适的Referer
-    const refererMap = {
-        'doubanio.com': 'https://movie.douban.com/',
-        'img1.doubanio.com': 'https://movie.douban.com/',
-        'img2.doubanio.com': 'https://movie.douban.com/',
-        'img3.doubanio.com': 'https://movie.douban.com/',
-        'img9.doubanio.com': 'https://movie.douban.com/',
-        'www.cls.cn': 'https://www.cls.cn/',
-        'eq.10jqka.com.cn': 'https://eq.10jqka.com.cn/',
-        'news.10jqka.com.cn': 'https://news.10jqka.com.cn/'
-    };
-   
-    // 查找匹配的Referer
-    for (const [domain, referer] of Object.entries(refererMap)) {
-        if (hostname === domain || hostname.endsWith('.' + domain)) {
-            return referer;
-        }
-    }
-   
-    // 默认返回https协议
-    return `https://${hostname}/`;
 }
