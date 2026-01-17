@@ -171,16 +171,29 @@ async function fetchContentWithType(targetUrl, requestHeaders) {
         const content = await response.text();
         const contentType = response.headers.get('content-type') || '';
         logDebug(`请求成功: ${targetUrl}, Content-Type: ${contentType}, 内容长度: ${content.length}`);
-        // 在 fetchContentWithType 函数末尾，return 前添加：
-console.log('[DEBUG-IMG] Target URL:', targetUrl);
-console.log('[DEBUG-IMG] Content-Type:', contentType);
-console.log('[DEBUG-IMG] Content length:', content.length);
-console.log('[DEBUG-IMG] First 100 chars:', content.substring(0, 100));
+// 示例：在 fetch 完成后、处理 response 之前添加（根据你的代码结构调整位置）
 
-// 如果是图片类型，可以额外输出最后几个字符（可选）
-if (contentType.includes('image/')) {
-    console.log('[DEBUG-IMG] Last 20 chars (should be binary end):', content.slice(-20));
+// 假设你有这样的代码：
+const response = await fetch(targetUrlStr, fetchOptions);
+
+// 添加调试日志
+console.log('[DEBUG-PROXY] Target URL:', targetUrlStr);
+console.log('[DEBUG-PROXY] Response Status:', response.status);
+console.log('[DEBUG-PROXY] Content-Type:', response.headers.get('Content-Type'));
+console.log('[DEBUG-PROXY] Content-Length:', response.headers.get('Content-Length') || 'unknown');
+
+// 读取 body 并输出前 200 字符（如果是文本）或长度
+const content = await response.text();  // 注意：这里用 text()，因为我们要看内容
+console.log('[DEBUG-PROXY] Body length:', content.length);
+console.log('[DEBUG-PROXY] Body first 200 chars:', content.substring(0, 200));
+
+// 如果是图片，额外检查是否是二进制开头（JPEG 通常以 FF D8 FF 开头）
+if (content.length > 10) {
+    const firstBytes = Array.from(new Uint8Array(content.slice(0, 10).split('').map(c => c.charCodeAt(0))));
+    console.log('[DEBUG-PROXY] First 10 bytes (hex):', firstBytes.map(b => b.toString(16).padStart(2, '0')).join(' '));
 }
+
+// 继续原有逻辑，返回 response
         // 返回结果
         return { content, contentType, responseHeaders: response.headers };
 
