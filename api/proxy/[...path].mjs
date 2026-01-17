@@ -52,28 +52,31 @@ function logDebug(message) {
  * @param {string} encodedPath - URL 编码后的路径部分 (例如 "https%3A%2F%2F...")
  * @returns {string|null} 解码后的目标 URL，如果无效则返回 null。
  */
-function getTargetUrlFromPath(encodedPath) {
-    if (!encodedPath) {
-        logDebug("getTargetUrlFromPath 收到空路径。");
+function getTargetUrlFromPath(pathname) {
+    // Cloudflare Pages [[path]] 会捕获 /proxy/ 后面的所有路径部分（不含查询字符串）
+    // 所以 pathname 应该是 /proxy/encoded-target-url
+    const parts = pathname.split('/').filter(Boolean); // ['proxy', 'https%3A%2F%2F...', ...]
+
+    if (parts.length < 2 || parts[0] !== 'proxy') {
         return null;
     }
+
+    // 取 'proxy' 之后的所有部分，重新组合成 encoded 字符串
+    const encodedParts = parts.slice(1);
+    let encodedUrl = encodedParts.join('/');
+
     try {
-        const decodedUrl = decodeURIComponent(encodedPath);
-        // 基础检查，看是否像一个 HTTP/HTTPS URL
-        if (decodedUrl.match(/^https?:\/\/.+/i)) {
-            return decodedUrl;
-        } else {
-            logDebug(`无效的解码 URL 格式: ${decodedUrl}`);
-            // 备选检查：原始路径是否未编码但看起来像 URL？
-            if (encodedPath.match(/^https?:\/\/.+/i)) {
-                logDebug(`警告: 路径未编码但看起来像 URL: ${encodedPath}`);
-                return encodedPath;
-            }
-            return null;
+        const decoded = decodeURIComponent(encodedUrl);
+        if (decoded.startsWith('http://') || decoded.startsWith('https://')) {
+            return decoded;
         }
-    } catch (e) {
-        // 捕获解码错误 (例如格式错误的 URI)
-        logDebug(`解码目标 URL 出错: ${encodedPath} - ${e.message}`);
+        // 如果解码失败或不是 URL，尝试用原始 encodedUrl
+        if (encodedUrl.startsWith('http%3A%2F%2F') || encodedUrl.startsWith('https%3A%2F%2F')) {
+            return decodeURIComponent(encodedUrl); // 强制再试一次
+        }
+        return null;
+    } catch (err) {
+        console.error('URL decode error:', err);
         return null;
     }
 }
