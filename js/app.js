@@ -1,5 +1,3 @@
-[file name]: app.js
-[file content begin]
 // 全局变量
 let selectedAPIs = JSON.parse(localStorage.getItem('selectedAPIs') || '["bfzy","dbzy","ikun","ruyi"]'); // 默认选中资源
 let customAPIs = JSON.parse(localStorage.getItem('customAPIs') || '[]'); // 存储自定义API列表
@@ -733,92 +731,75 @@ async function search() {
         }
 
         // 添加XSS保护，使用textContent和属性转义
-const safeResults = allResults.map(item => {
-    const safeId = item.vod_id ? item.vod_id.toString().replace(/[^\w-]/g, '') : '';
-    const safeName = (item.vod_name || '').toString()
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    const sourceInfo = item.source_name ?
-        `<span class="bg-gray-900 text-xs px-1.5 py-0.5 rounded-full">${item.source_name}</span>` : '';
-    const sourceCode = item.source_code || '';
+        const safeResults = allResults.map(item => {
+            const safeId = item.vod_id ? item.vod_id.toString().replace(/[^\w-]/g, '') : '';
+            const safeName = (item.vod_name || '').toString()
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+            const sourceInfo = item.source_name ?
+                `<span class="bg-gray-900 text-xs px-1.5 py-0.5 rounded-full">${item.source_name}</span>` : '';
+            const sourceCode = item.source_code || '';
 
-    // 添加API URL属性，用于详情获取
-    const apiUrlAttr = item.api_url ?
-        `data-api-url="${item.api_url.replace(/"/g, '&quot;')}"` : '';
+            // 添加API URL属性，用于详情获取
+            const apiUrlAttr = item.api_url ?
+                `data-api-url="${item.api_url.replace(/"/g, '&quot;')}"` : '';
 
-    const coverUrl = item.vod_pic || '';
-    const hasCover = coverUrl && (coverUrl.startsWith('http://') || coverUrl.startsWith('https://'));
-    const localPlaceholder = 'image/nomedia.png';
-    const proxiedCoverUrl = hasCover ? PROXY_URL + encodeURIComponent(coverUrl) : '';
-    
-    // 添加豆瓣信息
-    const doubanInfo = item.douban_info || {};
-    const doubanRating = doubanInfo.rating || '';
-    const doubanCover = doubanInfo.cover || '';
-    const doubanUrl = doubanInfo.url || '';
-    
-    // 如果有豆瓣封面，使用豆瓣封面
-    const finalCoverUrl = doubanCover || coverUrl;
-    const finalHasCover = finalCoverUrl && (finalCoverUrl.startsWith('http://') || finalCoverUrl.startsWith('https://'));
-    const finalProxiedCoverUrl = finalHasCover ? PROXY_URL + encodeURIComponent(finalCoverUrl) : '';
+            const coverUrl = item.vod_pic || '';
+            const hasCover = coverUrl && (coverUrl.startsWith('http://') || coverUrl.startsWith('https://'));
+            const localPlaceholder = 'image/nomedia.png';
+            const proxiedCoverUrl = hasCover ? PROXY_URL + encodeURIComponent(coverUrl) : '';
 
-    // 确定图片容器和内容容器的宽度
-    const imageWidthClass = finalHasCover ? 'w-1/3' : '';
-    const contentWidthClass = finalHasCover ? 'w-2/3' : 'w-full';
-
-    return `
-        <div class="card-hover bg-[#111] rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.02] h-full shadow-sm hover:shadow-md" 
-             onclick="showDetails('${safeId}','${safeName}','${sourceCode}')" ${apiUrlAttr}>
-            <div class="flex h-full">
-                ${finalHasCover ? `
-                <div class="relative flex-shrink-0 search-card-img-container ${imageWidthClass}">
-                    <img src="${finalCoverUrl}" alt="${safeName}" 
-                         class="h-full w-full object-cover transition-transform hover:scale-110" 
-                         onerror="this.onerror=null; this.src='${finalProxiedCoverUrl}'; this.onerror=function(){this.src='${localPlaceholder}'};"
-                         loading="lazy" referrerpolicy="no-referrer">
-                    <div class="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent"></div>
-                    ${doubanRating ? `
-                    <div class="absolute top-1 right-1 bg-black/70 rounded-full px-1.5 py-0.5 flex items-center">
-                        <a href="${doubanUrl}" target="_blank" rel="noopener noreferrer" title="在豆瓣查看" onclick="event.stopPropagation();" class="text-yellow-400 text-xs flex items-center">
-                            ★ ${doubanRating}
-                        </a>
-                    </div>` : ''}
-                </div>` : ''}
-                
-                <div class="p-2 flex flex-col flex-grow ${contentWidthClass}">
-                    <div class="flex-grow">
-                        <h3 class="font-semibold mb-2 break-words line-clamp-2 ${finalHasCover ? '' : 'text-center'}" title="${safeName}">${safeName}</h3>
-                        
-                        <div class="flex flex-wrap ${finalHasCover ? '' : 'justify-center'} gap-1 mb-2">
-                            ${(item.type_name || '').toString().replace(/</g, '&lt;') ?
-                `<span class="text-xs py-0.5 px-1.5 rounded bg-opacity-20 bg-blue-500 text-blue-300">
-                                  ${(item.type_name || '').toString().replace(/</g, '&lt;')}
-                              </span>` : ''}
-                            ${(item.vod_year || '') ?
-                `<span class="text-xs py-0.5 px-1.5 rounded bg-opacity-20 bg-purple-500 text-purple-300">
-                                  ${item.vod_year}
-                              </span>` : ''}
-                        </div>
-                        <p class="text-gray-400 line-clamp-2 overflow-hidden ${finalHasCover ? '' : 'text-center'} mb-2">
-                            ${(item.vod_remarks || '暂无介绍').toString().replace(/</g, '&lt;')}
-                        </p>
-                    </div>
-                    
-                    <div class="flex justify-between items-center mt-1 pt-1 border-t border-gray-800">
-                        ${sourceInfo ? `<div>${sourceInfo}</div>` : '<div></div>'}
-                        <!-- 豆瓣评分显示 -->
-                        ${doubanRating ? `<div class="text-yellow-400 text-xs flex items-center">
-                            <a href="${doubanUrl}" target="_blank" rel="noopener noreferrer" title="在豆瓣查看" onclick="event.stopPropagation();">
-                                ★ ${doubanRating}
-                            </a>
+            return `
+                <div class="card-hover bg-[#111] rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.02] h-full shadow-sm hover:shadow-md" 
+                     onclick="showDetails('${safeId}','${safeName}','${sourceCode}')" ${apiUrlAttr}>
+                    <div class="flex h-full">
+                        ${hasCover ? `
+                        <div class="relative flex-shrink-0 search-card-img-container">
+                            <img src="${coverUrl}" alt="${safeName}" 
+                                 class="h-full w-full object-cover transition-transform hover:scale-110" 
+                                 onerror="this.onerror=null; this.src='${proxiedCoverUrl}'; this.onerror=function(){this.src='${localPlaceholder}'};"
+                                 loading="lazy" referrerpolicy="no-referrer">
+                            <div class="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent"></div>
                         </div>` : ''}
+                        
+                        <div class="p-2 flex flex-col flex-grow">
+                            <div class="flex-grow">
+                                <h3 class="font-semibold mb-2 break-words line-clamp-2 ${hasCover ? '' : 'text-center'}" title="${safeName}">${safeName}</h3>
+                                
+                                <div class="flex flex-wrap ${hasCover ? '' : 'justify-center'} gap-1 mb-2">
+                                    ${(item.type_name || '').toString().replace(/</g, '&lt;') ?
+                    `<span class="text-xs py-0.5 px-1.5 rounded bg-opacity-20 bg-blue-500 text-blue-300">
+                                          ${(item.type_name || '').toString().replace(/</g, '&lt;')}
+                                      </span>` : ''}
+                                    ${(item.vod_year || '') ?
+                    `<span class="text-xs py-0.5 px-1.5 rounded bg-opacity-20 bg-purple-500 text-purple-300">
+                                          ${item.vod_year}
+                                      </span>` : ''}
+                                </div>
+                                <p class="text-gray-400 line-clamp-2 overflow-hidden ${hasCover ? '' : 'text-center'} mb-2">
+                                    ${(item.vod_remarks || '暂无介绍').toString().replace(/</g, '&lt;')}
+                                </p>
+                            </div>
+                            
+                            <div class="flex justify-between items-center mt-1 pt-1 border-t border-gray-800">
+                                ${sourceInfo ? `<div>${sourceInfo}</div>` : '<div></div>'}
+                                <!-- 接口名称过长会被挤变形
+                                <div>
+                                    <span class="text-gray-500 flex items-center hover:text-blue-400 transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                        </svg>
+                                        播放
+                                    </span>
+                                </div>
+                                -->
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    `;
-}).join('');
+            `;
+        }).join('');
 
         resultsDiv.innerHTML = safeResults;
     } catch (error) {
@@ -945,56 +926,26 @@ async function showDetails(id, vod_name, sourceCode) {
                 // Check if there's any actual grid content
                 const hasGridContent = data.videoInfo.type || data.videoInfo.year || data.videoInfo.area || data.videoInfo.director || data.videoInfo.actor || data.videoInfo.remarks;
 
-                // 获取豆瓣信息
-                const doubanInfo = data.videoInfo.douban_info || {};
-                const doubanRating = doubanInfo.rating || '';
-                const doubanCover = doubanInfo.cover || '';
-                const doubanUrl = doubanInfo.url || '';
-                
-                // 如果有豆瓣封面，显示在右侧
-const doubanCoverHtml = doubanCover ? `
-    <div class="detail-douban-cover ml-4 flex-shrink-0">
-        <div class="w-32 h-40 md:w-40 md:h-52 rounded-lg overflow-hidden shadow-lg relative">
-            <img src="${doubanCover}" alt="豆瓣封面" 
-                 class="w-full h-full object-cover"
-                 onerror="this.style.display='none';"
-                 loading="lazy" referrerpolicy="no-referrer">
-            ${doubanRating ? `
-            <div class="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm rounded-full px-2 py-1">
-                <a href="${doubanUrl}" target="_blank" rel="noopener noreferrer" title="在豆瓣查看" class="text-yellow-400 text-sm font-semibold flex items-center">
-                    ★ ${doubanRating}
-                </a>
-            </div>` : ''}
-        </div>
-    </div>
-` : '';
-
-if (hasGridContent || descriptionText || doubanCover) {
-    detailInfoHtml = `
-<div class="modal-detail-info mb-4 ${doubanCover ? 'flex flex-col md:flex-row md:items-start' : ''}">
-    <div class="detail-info-content ${doubanCover ? 'md:flex-1' : ''}">
-        ${hasGridContent ? `
-        <div class="detail-grid grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
-            ${data.videoInfo.type ? `<div class="detail-item"><span class="detail-label">类型:</span> <span class="detail-value">${data.videoInfo.type}</span></div>` : ''}
-            ${data.videoInfo.year ? `<div class="detail-item"><span class="detail-label">年份:</span> <span class="detail-value">${data.videoInfo.year}</span></div>` : ''}
-            ${data.videoInfo.area ? `<div class="detail-item"><span class="detail-label">地区:</span> <span class="detail-value">${data.videoInfo.area}</span></div>` : ''}
-            ${data.videoInfo.director ? `<div class="detail-item"><span class="detail-label">导演:</span> <span class="detail-value">${data.videoInfo.director}</span></div>` : ''}
-            ${data.videoInfo.actor ? `<div class="detail-item"><span class="detail-label">主演:</span> <span class="detail-value">${data.videoInfo.actor}</span></div>` : ''}
-            ${data.videoInfo.remarks ? `<div class="detail-item"><span class="detail-label">备注:</span> <span class="detail-value">${data.videoInfo.remarks}</span></div>` : ''}
-            ${doubanRating && !doubanCover ? `<div class="detail-item"><span class="detail-label">豆瓣评分:</span> <span class="detail-value">
-                <a href="${doubanUrl}" target="_blank" rel="noopener noreferrer" title="在豆瓣查看" class="text-yellow-400 font-semibold">★ ${doubanRating}</a>
-            </span></div>` : ''}
-        </div>` : ''}
-        ${descriptionText ? `
-        <div class="detail-desc">
-            <p class="detail-label font-medium mb-2 text-gray-300">简介:</p>
-            <p class="detail-desc-content text-gray-400 text-sm leading-relaxed max-h-32 overflow-y-auto pr-2">${descriptionText}</p>
-        </div>` : ''}
-    </div>
-    ${doubanCoverHtml}
-</div>
-`;
-}
+                if (hasGridContent || descriptionText) { // Only build if there's something to show
+                    detailInfoHtml = `
+                <div class="modal-detail-info">
+                    ${hasGridContent ? `
+                    <div class="detail-grid">
+                        ${data.videoInfo.type ? `<div class="detail-item"><span class="detail-label">类型:</span> <span class="detail-value">${data.videoInfo.type}</span></div>` : ''}
+                        ${data.videoInfo.year ? `<div class="detail-item"><span class="detail-label">年份:</span> <span class="detail-value">${data.videoInfo.year}</span></div>` : ''}
+                        ${data.videoInfo.area ? `<div class="detail-item"><span class="detail-label">地区:</span> <span class="detail-value">${data.videoInfo.area}</span></div>` : ''}
+                        ${data.videoInfo.director ? `<div class="detail-item"><span class="detail-label">导演:</span> <span class="detail-value">${data.videoInfo.director}</span></div>` : ''}
+                        ${data.videoInfo.actor ? `<div class="detail-item"><span class="detail-label">主演:</span> <span class="detail-value">${data.videoInfo.actor}</span></div>` : ''}
+                        ${data.videoInfo.remarks ? `<div class="detail-item"><span class="detail-label">备注:</span> <span class="detail-value">${data.videoInfo.remarks}</span></div>` : ''}
+                    </div>` : ''}
+                    ${descriptionText ? `
+                    <div class="detail-desc">
+                        <p class="detail-label">简介:</p>
+                        <p class="detail-desc-content">${descriptionText}</p>
+                    </div>` : ''}
+                </div>
+                `;
+                }
             }
 
             currentEpisodes = data.episodes;
@@ -1407,4 +1358,3 @@ function saveStringAsFile(content, fileName) {
 }
 
 // 移除Node.js的require语句，因为这是在浏览器环境中运行的
-[file content end]
