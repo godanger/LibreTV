@@ -2,6 +2,9 @@
 let selectedAPIs = JSON.parse(localStorage.getItem('selectedAPIs') || '["bfzy","dbzy","ikun","ruyi"]'); // 默认选中资源
 let customAPIs = JSON.parse(localStorage.getItem('customAPIs') || '[]'); // 存储自定义API列表
 
+// 豆瓣评分缓存
+let doubanRatingCache = {};
+
 // 添加当前播放的集数索引
 let currentEpisodeIndex = 0;
 // 添加当前视频的所有集数
@@ -153,6 +156,216 @@ function addAdultAPI() {
         });
         container.appendChild(adultdiv);
     }
+}
+
+// 获取豆瓣评分
+async function getDoubanRating(title) {
+    if (!title) return null;
+    
+    // 检查缓存
+    const cacheKey = title.trim().toLowerCase();
+    if (doubanRatingCache[cacheKey]) {
+        return doubanRatingCache[cacheKey];
+    }
+    
+    try {
+        // 豆瓣搜索API
+        const searchUrl = `https://movie.douban.com/j/subject_suggest?q=${encodeURIComponent(title)}`;
+        
+        // 使用代理访问豆瓣API
+        const proxiedUrl = PROXY_URL + encodeURIComponent(searchUrl);
+        
+        const response = await fetch(proxiedUrl, {
+            headers: {
+                'User-Agent': getRandomUA(),
+                'Referer': 'https://movie.douban.com/'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`豆瓣API请求失败: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+            // 取第一个匹配的结果
+            const firstResult = data[0];
+            let rating = firstResult.rating ? firstResult.rating.value || firstResult.rating : null;
+            
+            // 如果有评分，格式化为一位小数
+            if (rating) {
+                rating = parseFloat(rating).toFixed(1);
+            }
+            
+            // 缓存结果（缓存5分钟）
+            doubanRatingCache[cacheKey] = rating;
+            setTimeout(() => {
+                delete doubanRatingCache[cacheKey];
+            }, 5 * 60 * 1000);
+            
+            return rating;
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('获取豆瓣评分失败:', error);
+        return null;
+    }
+}
+
+// 批量获取豆瓣评分（优化性能）
+async function getDoubanRatingsBatch(titles) {
+    if (!titles || titles.length === 0) return {};
+    
+    const ratings = {};
+    const titlesToFetch = [];
+    
+    // 首先检查缓存
+    for (const title of titles) {
+        const cacheKey = title.trim().toLowerCase();
+        if (doubanRatingCache[cacheKey] !== undefined) {
+            ratings[title] = doubanRatingCache[cacheKey];
+        } else {
+            titlesToFetch.push(title);
+        }
+    }
+    
+    // 如果所有标题都在缓存中，直接返回
+    if (titlesToFetch.length === 0) {
+        return ratings;
+    }
+    
+    // 批量获取（限制并发数，避免请求过多）
+    const batchSize = 3;
+    const results = {};
+    
+    for (let i = 0; i < titlesToFetch.length; i += batchSize) {
+        const batch = titlesToFetch.slice(i, i + batchSize);
+        const promises = batch.map(title => getDoubanRating(title));
+        
+        try {
+            const batchResults = await Promise.all(promises);
+            batch.forEach((title, index) => {
+                results[title] = batchResults[index];
+            });
+            
+            // 小延迟，避免请求过于频繁
+            if (i + batchSize < titlesToFetch.length) {
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+        } catch (error) {
+            console.error('批量获取豆瓣评分失败:', error);
+            // 继续处理其他请求
+        }
+    }
+    
+    // 合并结果
+    return { ...ratings, ...results };
+}
+
+// 获取随机User-Agent
+function getRandomUA() {
+    const uas = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0',
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',
+    ];
+    return uas[Math.floor(Math.random() * uas.length)];
+}
+
+// 渲染搜索结果（包含豆瓣评分）
+function renderSearchResults(allResults, doubanRatings, resultsDiv) {
+    // 添加XSS保护，使用textContent和属性转义
+    const safeResults = allResults.map(item => {
+        const safeId = item.vod_id ? item.vod_id.toString().replace(/[^\w-]/g, '') : '';
+        const safeName = (item.vod_name || '').toString()
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+        const sourceInfo = item.source_name ?
+            `<span class="bg-gray-900 text-xs px-1.5 py-0.5 rounded-full">${item.source_name}</span>` : '';
+        const sourceCode = item.source_code || '';
+
+        // 添加API URL属性，用于详情获取
+        const apiUrlAttr = item.api_url ?
+            `data-api-url="${item.api_url.replace(/"/g, '&quot;')}"` : '';
+
+        const coverUrl = item.vod_pic || '';
+        const hasCover = coverUrl && (coverUrl.startsWith('http://') || coverUrl.startsWith('https://'));
+        const localPlaceholder = 'image/nomedia.png';
+        const proxiedCoverUrl = hasCover ? PROXY_URL + encodeURIComponent(coverUrl) : '';
+
+        // 获取豆瓣评分
+        const doubanRating = item.vod_name ? doubanRatings[item.vod_name] : null;
+        const showRating = doubanRating && parseFloat(doubanRating) > 0;
+        
+        // 创建卡片内容
+        let cardContent = `
+            <div class="card-hover bg-[#111] rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.02] h-full shadow-sm hover:shadow-md" 
+                 onclick="showDetails('${safeId}','${safeName}','${sourceCode}')" ${apiUrlAttr}>
+                <div class="flex h-full">
+                    ${hasCover ? `
+                    <div class="relative flex-shrink-0 search-card-img-container">
+                        <img src="${coverUrl}" alt="${safeName}" 
+                             class="h-full w-full object-cover transition-transform hover:scale-110" 
+                             onerror="this.onerror=null; this.src='${proxiedCoverUrl}'; this.onerror=function(){this.src='${localPlaceholder}'};"
+                             loading="lazy" referrerpolicy="no-referrer">
+                        <div class="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent"></div>
+                        
+                        <!-- 豆瓣评分显示 -->
+                        ${showRating ? `
+                        <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-sm text-white text-xs px-1.5 py-1 rounded-md flex items-center">
+                            <span class="text-yellow-400 mr-1">★</span>
+                            <span>${doubanRating}</span>
+                        </div>` : ''}
+                        
+                        <!-- 集数/备注显示在右上角 -->
+                        ${(item.vod_remarks || '').toString().trim() ? `
+                        <div class="absolute top-2 right-2 bg-black/70 backdrop-blur-sm text-white text-xs px-1.5 py-0.5 rounded">
+                            ${(item.vod_remarks || '').toString().substring(0, 6)}
+                            ${(item.vod_remarks || '').toString().length > 6 ? '...' : ''}
+                        </div>` : ''}
+                    </div>` : ''}
+                    
+                    <div class="p-2 flex flex-col flex-grow">
+                        <div class="flex-grow">
+                            <h3 class="font-semibold mb-2 break-words line-clamp-2 ${hasCover ? '' : 'text-center'}" title="${safeName}">${safeName}</h3>
+                            
+                            <div class="flex flex-wrap ${hasCover ? '' : 'justify-center'} gap-1 mb-2">
+                                ${(item.type_name || '').toString().replace(/</g, '&lt;') ?
+                                `<span class="text-xs py-0.5 px-1.5 rounded bg-opacity-20 bg-blue-500 text-blue-300">
+                                    ${(item.type_name || '').toString().replace(/</g, '&lt;')}
+                                </span>` : ''}
+                                ${(item.vod_year || '') ?
+                                `<span class="text-xs py-0.5 px-1.5 rounded bg-opacity-20 bg-purple-500 text-purple-300">
+                                    ${item.vod_year}
+                                </span>` : ''}
+                            </div>
+                            <p class="text-gray-400 line-clamp-2 overflow-hidden ${hasCover ? '' : 'text-center'} mb-2">
+                                ${(item.vod_remarks || '暂无介绍').toString().replace(/</g, '&lt;')}
+                            </p>
+                        </div>
+                        
+                        <div class="flex justify-between items-center mt-1 pt-1 border-t border-gray-800">
+                            ${sourceInfo ? `<div>${sourceInfo}</div>` : '<div></div>'}
+                            <!-- 如果有豆瓣评分，在右下角也显示 -->
+                            ${showRating && !hasCover ? `
+                            <div class="flex items-center text-yellow-400 text-xs">
+                                <span class="mr-1">★</span>
+                                <span>${doubanRating}</span>
+                            </div>` : '<div></div>'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        return cardContent;
+    }).join('');
+
+    resultsDiv.innerHTML = safeResults;
 }
 
 // 检查是否有成人API被选中
@@ -772,99 +985,6 @@ async function search() {
     }
 }
 
-// 新增：渲染搜索结果函数
-function renderSearchResults(allResults, doubanRatings, resultsDiv) {
-    // 添加XSS保护，使用textContent和属性转义
-    const safeResults = allResults.map(item => {
-        const safeId = item.vod_id ? item.vod_id.toString().replace(/[^\w-]/g, '') : '';
-        const safeName = (item.vod_name || '').toString()
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-        const sourceInfo = item.source_name ?
-            `<span class="bg-gray-900 text-xs px-1.5 py-0.5 rounded-full">${item.source_name}</span>` : '';
-        const sourceCode = item.source_code || '';
-
-        // 添加API URL属性，用于详情获取
-        const apiUrlAttr = item.api_url ?
-            `data-api-url="${item.api_url.replace(/"/g, '&quot;')}"` : '';
-
-        const coverUrl = item.vod_pic || '';
-        const hasCover = coverUrl && (coverUrl.startsWith('http://') || coverUrl.startsWith('https://'));
-        const localPlaceholder = 'image/nomedia.png';
-        const proxiedCoverUrl = hasCover ? PROXY_URL + encodeURIComponent(coverUrl) : '';
-
-        // 获取豆瓣评分
-        const doubanRating = item.vod_name ? doubanRatings[item.vod_name] : null;
-        const showRating = doubanRating && parseFloat(doubanRating) > 0;
-        
-        // 创建卡片内容
-        let cardContent = `
-            <div class="card-hover bg-[#111] rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.02] h-full shadow-sm hover:shadow-md" 
-                 onclick="showDetails('${safeId}','${safeName}','${sourceCode}')" ${apiUrlAttr}>
-                <div class="flex h-full">
-                    ${hasCover ? `
-                    <div class="relative flex-shrink-0 search-card-img-container">
-                        <img src="${coverUrl}" alt="${safeName}" 
-                             class="h-full w-full object-cover transition-transform hover:scale-110" 
-                             onerror="this.onerror=null; this.src='${proxiedCoverUrl}'; this.onerror=function(){this.src='${localPlaceholder}'};"
-                             loading="lazy" referrerpolicy="no-referrer">
-                        <div class="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent"></div>
-                        
-                        <!-- 豆瓣评分显示 -->
-                        ${showRating ? `
-                        <div class="absolute bottom-2 left-2 bg-black/70 backdrop-blur-sm text-white text-xs px-1.5 py-1 rounded-md flex items-center">
-                            <span class="text-yellow-400 mr-1">★</span>
-                            <span>${doubanRating}</span>
-                        </div>` : ''}
-                        
-                        <!-- 集数/备注显示在右上角 -->
-                        ${(item.vod_remarks || '').toString().trim() ? `
-                        <div class="absolute top-2 right-2 bg-black/70 backdrop-blur-sm text-white text-xs px-1.5 py-0.5 rounded">
-                            ${(item.vod_remarks || '').toString().substring(0, 6)}
-                            ${(item.vod_remarks || '').toString().length > 6 ? '...' : ''}
-                        </div>` : ''}
-                    </div>` : ''}
-                    
-                    <div class="p-2 flex flex-col flex-grow">
-                        <div class="flex-grow">
-                            <h3 class="font-semibold mb-2 break-words line-clamp-2 ${hasCover ? '' : 'text-center'}" title="${safeName}">${safeName}</h3>
-                            
-                            <div class="flex flex-wrap ${hasCover ? '' : 'justify-center'} gap-1 mb-2">
-                                ${(item.type_name || '').toString().replace(/</g, '&lt;') ?
-                                `<span class="text-xs py-0.5 px-1.5 rounded bg-opacity-20 bg-blue-500 text-blue-300">
-                                    ${(item.type_name || '').toString().replace(/</g, '&lt;')}
-                                </span>` : ''}
-                                ${(item.vod_year || '') ?
-                                `<span class="text-xs py-0.5 px-1.5 rounded bg-opacity-20 bg-purple-500 text-purple-300">
-                                    ${item.vod_year}
-                                </span>` : ''}
-                            </div>
-                            <p class="text-gray-400 line-clamp-2 overflow-hidden ${hasCover ? '' : 'text-center'} mb-2">
-                                ${(item.vod_remarks || '暂无介绍').toString().replace(/</g, '&lt;')}
-                            </p>
-                        </div>
-                        
-                        <div class="flex justify-between items-center mt-1 pt-1 border-t border-gray-800">
-                            ${sourceInfo ? `<div>${sourceInfo}</div>` : '<div></div>'}
-                            <!-- 如果有豆瓣评分，在右下角也显示 -->
-                            ${showRating && !hasCover ? `
-                            <div class="flex items-center text-yellow-400 text-xs">
-                                <span class="mr-1">★</span>
-                                <span>${doubanRating}</span>
-                            </div>` : '<div></div>'}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        return cardContent;
-    }).join('');
-
-    resultsDiv.innerHTML = safeResults;
-}
-
 // 切换清空按钮的显示状态
 function toggleClearButton() {
     const searchInput = document.getElementById('searchInput');
@@ -1407,5 +1527,3 @@ function saveStringAsFile(content, fileName) {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
 }
-
-// 移除Node.js的require语句，因为这是在浏览器环境中运行的
