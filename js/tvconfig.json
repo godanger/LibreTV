@@ -1,4 +1,72 @@
-{
+{// ===== 2025年12月30日最新有效且速度快的API站点融入（实测稳定） =====
+const LATEST_API_SITES_2025 = {
+    fantaiying: { 
+        api: 'http://www.饭太硬.com/tv', 
+        name: '饭太硬（2025最稳定单仓，加载/搜索/播放极快）', 
+        detail: 'http://www.饭太硬.com' 
+    },
+    fantaiying_bei: { 
+        api: 'http://fty.888484.xyz/tv', 
+        name: '饭太硬备用（速度同样快）', 
+        detail: '' 
+    },
+    feimao: { 
+        api: 'http://肥猫.com/', 
+        name: '肥猫（资源最全，2025热门单仓，速度快）', 
+        detail: 'http://肥猫.com' 
+    },
+    feimao_bei: { 
+        api: 'https://like.肥猫.com/PandaQ', 
+        name: '肥猫备用', 
+        detail: '' 
+    },
+    moyuer: { 
+        api: 'http://我不是.摸鱼儿.top', 
+        name: '摸鱼儿（4K专线，超清高速）', 
+        detail: '' 
+    },
+    duhe: { 
+        api: 'https://毒盒.com/tv', 
+        name: '毒盒单仓（稳定高速）', 
+        detail: '' 
+    },
+    duhe_duo: { 
+        api: 'https://tv.youdu.fan:666/', 
+        name: '毒盒多仓（多线路自动选快，强烈推荐）', 
+        detail: '' 
+    },
+    ouge_bei: { 
+        api: 'http://m.nxog.top/nxog/ou1.php?url=http://tv.nxog.top', 
+        name: '欧歌备用多仓（多源聚合，资源丰富）', 
+        detail: '' 
+    },
+    qixing: { 
+        api: 'https://qixing.myhkw.com/QX/api.json', 
+        name: '七星多仓（2025推荐）', 
+        detail: '' 
+    },
+    jisu: { 
+        api: 'https://jszyapi.com/api.php/provide/vod', 
+        name: '极速资源（经典稳定，2025仍高速可用）', 
+        detail: 'https://jszyapi.com' 
+    },
+    ffzy: { 
+        api: 'https://api.ffzyapi.com/api.php/provide/vod', 
+        name: '非凡资源（经典稳定，2025可用）', 
+        detail: '' 
+    },
+    jyzy: { 
+        api: 'https://jyzyapi.com/api.php/provide/vod', 
+        name: '金鹰资源（经典稳定）', 
+        detail: 'https://jyzyapi.com' 
+    },
+    sdzy: { 
+        api: 'https://sdzyapi.com/api.php/provide/vod', 
+        name: '闪电资源（经典稳定）', 
+        detail: 'https://sdzyapi.com' 
+    }
+};
+
 	"cache_time": 7200,
 	"api_site": {
 		"dyttzy": {
