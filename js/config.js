@@ -22,14 +22,7 @@ const SITE_CONFIG = {
 
 // API站点配置
 const API_SITES = {
-    fantaiying: { 
-        api: 'http://www.饭太硬.com/tv', 
-        name: '饭太硬（稳定）'
-    },
-    feimao: { 
-        api: 'http://肥猫.com/', 
-        name: '肥猫（资源全）'
-    },
+
     jisu: { 
         api: 'https://jszyapi.com/api.php/provide/vod', 
         name: '极速资源'
