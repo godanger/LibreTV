@@ -24,15 +24,15 @@ const SITE_CONFIG = {
 const API_SITES = {
     fantaiying: { 
         api: 'http://www.饭太硬.com/tv', 
-        name: '饭太硬（2025稳定单仓）'
+        name: '饭太硬（稳定）'
     },
     feimao: { 
         api: 'http://肥猫.com/', 
-        name: '肥猫（资源全/速度快）'
+        name: '肥猫（资源全）'
     },
     jisu: { 
         api: 'https://jszyapi.com/api.php/provide/vod', 
-        name: '极速资源（标准V10）'
+        name: '极速资源'
     },
     ffzy: { 
         api: 'https://api.ffzyapi.com/api.php/provide/vod', 
