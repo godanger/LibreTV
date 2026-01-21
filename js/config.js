@@ -22,7 +22,26 @@ const SITE_CONFIG = {
 
 // API站点配置
 const API_SITES = {
-
+    fantaiying: { 
+        api: 'http://www.饭太硬.com/tv', 
+        name: '饭太硬（2025稳定单仓）'
+    },
+    feimao: { 
+        api: 'http://肥猫.com/', 
+        name: '肥猫（资源全/速度快）'
+    },
+    jisu: { 
+        api: 'https://jszyapi.com/api.php/provide/vod', 
+        name: '极速资源（标准V10）'
+    },
+    ffzy: { 
+        api: 'https://api.ffzyapi.com/api.php/provide/vod', 
+        name: '非凡资源' 
+    },
+    sdzy: { 
+        api: 'https://sdzyapi.com/api.php/provide/vod', 
+        name: '闪电资源' 
+    },
     ruyi: {
         api: 'https://cj.rycjapi.com/api.php/provide/vod',
         name: '如意资源',
@@ -36,11 +55,6 @@ const API_SITES = {
         name: '天涯资源',
     },
 
-    ffzy: {
-        api: 'http://ffzy5.tv/api.php/provide/vod',
-        name: '非凡影视',
-        detail: 'http://ffzy5.tv', 
-    },
 
     zy360: {
         api: 'https://360zy.com/api.php/provide/vod',
