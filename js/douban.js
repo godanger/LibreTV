@@ -538,7 +538,7 @@ async function fetchDoubanData(url) {
         headers: {
         'User-Agent': getRandomUA(),  // 随机UA防检测
         'Referer': 'https://movie.douban.com/',
-        Accept: 'image/jpeg,image/png,image/gif,*/*;q=0.8',
+        'Accept': 'application/json, text/plain, */*',
         }
     };
 
