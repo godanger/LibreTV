@@ -537,7 +537,7 @@ async function fetchDoubanData(url) {
         signal: controller.signal,
         headers: {
         'User-Agent': getRandomUA(),  // 随机UA防检测
-        'Referer': 'https://movie.douban.com/',
+        'Referer': '*.doubanio.com',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
         }
     };
