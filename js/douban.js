@@ -617,7 +617,7 @@ function renderDoubanCards(data, container, clear = true) {
                 .replace(/>/g, '&gt;');
             
             // 处理图片URL
-            // 1. 直接使用豆瓣图片URL (添加no-referrer属性)https://ddtv.dpdns.org/?url=
+            // 1. 直接使用豆瓣图片URL (添加no-referrer属性)https://ddtv.dpdns.org/?url=https://img.uumoe.com/
             //const originalCoverUrl = item.cover;
             const originalCoverUrl = (item.cover || '').replace(/img\d*\.doubanio\.com/g, 'img.doubanio.cmliussss.com');
             
