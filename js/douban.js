@@ -619,7 +619,7 @@ function renderDoubanCards(data, container, clear = true) {
             // 处理图片URL
             // 1. 直接使用豆瓣图片URL (添加no-referrer属性)https://ddtv.dpdns.org/?url=
             //const originalCoverUrl = item.cover;
-            const originalCoverUrl = (item.cover || '').replace(/img\d*\.doubanio\.com/g, 'img.doubanio.cmliussss.net');
+            const originalCoverUrl = (item.cover || '').replace(/img\d*\.doubanio\.com/g, 'img.doubanio.cmliussss.com');
             
             // 2. 也准备代理URL作为备选
             const proxiedCoverUrl = PROXY_URL + encodeURIComponent(originalCoverUrl);
