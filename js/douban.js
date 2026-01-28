@@ -619,7 +619,7 @@ function renderDoubanCards(data, container, clear = true) {
             // 处理图片URL
             // 1. 直接使用豆瓣图片URL (添加no-referrer属性)https://ddtv.dpdns.org/?url=
             //const originalCoverUrl = item.cover;
-            const originalCoverUrl = (item.cover || '').replace(/img\d*\.doubanio\.com/g, 'img.doubanio.cmliussss.com');
+            const originalCoverUrl = (item.cover || '').replace(/img\d*\.doubanio\.com/g, 'img.doubanio.cmliussss.net');
             
             // 2. 也准备代理URL作为备选
             const proxiedCoverUrl = PROXY_URL + encodeURIComponent(originalCoverUrl);
@@ -627,7 +627,7 @@ function renderDoubanCards(data, container, clear = true) {
             // 创建瀑布流卡片，高度自适应图片
             card.innerHTML = `
                 <div class="relative w-full aspect-[2/3] overflow-hidden cursor-pointer" onclick="fillAndSearchWithDouban('${safeTitle}')">
-                    <img src="${proxiedCoverUrl}" alt="${safeTitle}" 
+                    <img src="${originalCoverUrl}" alt="${safeTitle}" 
                         class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                         onerror="this.onerror=null; this.src='${originalCoverUrl}'; this.classList.add('object-contain');"
                         loading="lazy" referrerpolicy="no-referrer">
