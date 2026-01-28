@@ -617,8 +617,9 @@ function renderDoubanCards(data, container, clear = true) {
                 .replace(/>/g, '&gt;');
             
             // 处理图片URL
-            // 1. 直接使用豆瓣图片URL (添加no-referrer属性)
-            const originalCoverUrl = item.cover;
+            // 1. 直接使用豆瓣图片URL (添加no-referrer属性)https://ddtv.dpdns.org/?url=
+            //const originalCoverUrl = item.cover;
+            const originalCoverUrl = (item.cover || '').replacereplace(/img\d*\.doubanio\.com/g, 'img.doubanio.cmliussss.com');
             
             // 2. 也准备代理URL作为备选
             const proxiedCoverUrl = PROXY_URL + encodeURIComponent(originalCoverUrl);
@@ -628,7 +629,7 @@ function renderDoubanCards(data, container, clear = true) {
                 <div class="relative w-full aspect-[2/3] overflow-hidden cursor-pointer" onclick="fillAndSearchWithDouban('${safeTitle}')">
                     <img src="${proxiedCoverUrl}" alt="${safeTitle}" 
                         class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                        onerror="this.onerror=null; this.src='https://ddtv.dpdns.org/?url=${originalCoverUrl}'; this.classList.add('object-contain');"
+                        onerror="this.onerror=null; this.src='${originalCoverUrl}'; this.classList.add('object-contain');"
                         loading="lazy" referrerpolicy="no-referrer">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-30 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="absolute bottom-1 left-1 text-white text-xs px-1.5 py-1 rounded-sm backdrop-blur-sm">
