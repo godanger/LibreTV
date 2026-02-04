@@ -527,7 +527,7 @@ async function fetchDoubanData(url) {
         signal: controller.signal,
         headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
-            'Referer': 'movie.douban.com',
+            'Referer': 'https://movie.douban.com/',
             'Accept': 'application/json, text/plain, */*',
         }
     };
@@ -551,7 +551,7 @@ async function fetchDoubanData(url) {
         console.error("豆瓣 API 请求失败（直接代理）：", err);
         
         // 失败后尝试备用方法：作为备选
-        const fallbackUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+        const fallbackUrl = `https://ddtv.dpdns.org/?url=${encodeURIComponent(url)}`;
         
         try {
             const fallbackResponse = await fetch(fallbackUrl);
