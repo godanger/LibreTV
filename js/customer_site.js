@@ -24,10 +24,7 @@ const CUSTOMER_SITES = {
         api: 'https://api.maoyanapi.top/api.php/provide/vod/at/json',
         name: '猫眼资源'
     },
-    1080zy: {
-        api: 'https://api.1080zyku.com/inc/api_mac10.php',
-        name: '1080资源'
-    },
+
 
     jyzy: {
         api: 'https://jyzyapi.com/provide/vod',
