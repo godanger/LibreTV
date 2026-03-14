@@ -47,13 +47,50 @@ const API_SITES = {
         api: 'https://tyyszy.com/api.php/provide/vod',
         name: '天涯资源',
     },
-
-
+	1080zyku: {
+			"api": "https://api.1080zyku.com/inc/api_mac10.php",
+			"name": "1080资源",
+		},
+	bdzy: {
+			"api": "https://api.apibdzy.com/api.php/provide/vod",
+			"name": "百度资源"
+		}, 
+	ukuapi: {
+			"api": "https://api.ukuapi.com/api.php/provide/vod",
+			"name": "U酷资源",
+		},
+	yayazy: {
+			"api": "https://cj.yayazy.net/api.php/provide/vod",
+			"name": "丫丫点播",
+		},
+	suoniapi: {
+			"api": "https://suoniapi.com/api.php/provide/vod",
+			"name": "索尼资源",
+		},
+	hongniuzy2: {
+			"api": "https://www.hongniuzy2.com/api.php/provide/vod",
+			"name": "红牛资源",
+		},    
+	huyaapi: {
+			"api": "https://www.huyaapi.com/api.php/provide/vod",
+			"name": "虎牙资源",
+		},
     zy360: {
         api: 'https://360zy.com/api.php/provide/vod',
         name: '360资源',
     },
-
+	maoyanapi: {
+			"api": "https://api.maoyanapi.top/api.php/provide/vod/at/json",
+			"name": "猫眼资源",
+		},
+	jyzyapi_provide: {
+			"api": "https://jyzyapi.com/provide/vod",
+			"name": "金鹰资源",
+		},
+	yzzy_api: {
+			"api": "https://api.yzzy-api.com/inc/apijson.php",
+			"name": "优质资源",
+		},
     wolong: {
         api: 'https://wolongzyw.com/api.php/provide/vod',
         name: '卧龙资源',
@@ -85,7 +122,7 @@ const API_SITES = {
         name: '百度云资源'
     },
     wujin: {
-        api: 'https://api.wujinapi.me/api.php/provide/vod',
+        api: 'https://api.wujinapi.com/api.php/provide/vod',
         name: '无尽资源'
     },
     wwzy: {
