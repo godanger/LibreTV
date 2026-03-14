@@ -24,7 +24,14 @@ const CUSTOMER_SITES = {
         api: 'https://api.maoyanapi.top/api.php/provide/vod/at/json',
         name: '猫眼资源'
     },
-
+    ysgc: {
+        api: 'https://cj.lziapi.com/api.php/provide/vod/',
+        name: '影视工厂'
+    },
+    subo: {
+        api: 'https://subocaiji.com/api.php/provide/vod',
+        name: '速博资源'
+    },
 
     jyzy: {
         api: 'https://jyzyapi.com/provide/vod',
