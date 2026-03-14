@@ -23,12 +23,12 @@ const SITE_CONFIG = {
 // API站点配置
 const API_SITES = {
     ysgc: {
-            "api": "https://cj.lziapi.com/api.php/provide/vod/",
-            "name": "影视工厂"
+            api: 'https://cj.lziapi.com/api.php/provide/vod/',
+            name: '影视工厂'
         },
     subo: {
-            "api": "https://subocaiji.com/api.php/provide/vod",
-            "name": "速博资源",
+            api: 'https://subocaiji.com/api.php/provide/vod',
+            name: '速博资源',
         },
     jisu: { 
         api: 'https://jszyapi.com/api.php/provide/vod', 
@@ -55,48 +55,48 @@ const API_SITES = {
         name: '天涯资源',
     },
 	1080zy: {
-			"api": "https://api.1080zyku.com/inc/api_mac10.php",
-			"name": "1080资源",
+			api: 'https://api.1080zyku.com/inc/api_mac10.php',
+			name: '1080资源',
 		},
 	bdzy: {
-			"api": "https://api.apibdzy.com/api.php/provide/vod",
-			"name": "百度资源"
+			api: 'https://api.apibdzy.com/api.php/provide/vod',
+			name: '百度资源'
 		}, 
 	uku: {
-			"api": "https://api.ukuapi.com/api.php/provide/vod",
-			"name": "U酷资源",
+			api: 'https://api.ukuapi.com/api.php/provide/vod',
+			name: 'U酷资源',
 		},
 	yayazy: {
-			"api": "https://cj.yayazy.net/api.php/provide/vod",
-			"name": "丫丫点播",
+			api: 'https://cj.yayazy.net/api.php/provide/vod',
+			name: '丫丫点播',
 		},
 	suoni: {
-			"api": "https://suoniapi.com/api.php/provide/vod",
-			"name": "索尼资源",
+			api: 'https://suoniapi.com/api.php/provide/vod',
+			name: '索尼资源',
 		},
 	hongniu: {
-			"api": "https://www.hongniuzy2.com/api.php/provide/vod",
-			"name": "红牛资源",
+			api: 'https://www.hongniuzy2.com/api.php/provide/vod',
+			name: '红牛资源',
 		},    
 	huya: {
-			"api": "https://www.huyaapi.com/api.php/provide/vod",
-			"name": "虎牙资源",
+			api: 'https://www.huyaapi.com/api.php/provide/vod',
+			name: '虎牙资源',
 		},
     zy360: {
         api: 'https://360zy.com/api.php/provide/vod',
         name: '360资源',
     },
 	maoyan: {
-			"api": "https://api.maoyanapi.top/api.php/provide/vod/at/json",
-			"name": "猫眼资源",
+			api: 'https://api.maoyanapi.top/api.php/provide/vod/at/json',
+			name: '猫眼资源',
 		},
 	jyzy: {
-			"api": "https://jyzyapi.com/provide/vod",
-			"name": "金鹰资源",
+			api: 'https://jyzyapi.com/provide/vod',
+			name: '金鹰资源',
 		},
 	yzzy: {
-			"api": "https://api.yzzy-api.com/inc/apijson.php",
-			"name": "优质资源",
+			api: 'https://api.yzzy-api.com/inc/apijson.php',
+			name: '优质资源',
 		},
     wolong: {
         api: 'https://wolongzyw.com/api.php/provide/vod',
