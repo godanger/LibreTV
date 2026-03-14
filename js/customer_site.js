@@ -1,5 +1,8 @@
 const CUSTOMER_SITES = {
-
+    zyku: {
+        api: 'https://api.1080zyku.com/inc/api_mac10.php',
+        name: '1080资源'
+    },
     yayazy: {
         api: 'https://cj.yayazy.net/api.php/provide/vod',
         name: '丫丫点播'
