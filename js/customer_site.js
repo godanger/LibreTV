@@ -1,8 +1,8 @@
 const CUSTOMER_SITES = {
-    qiqi: {
-        api: 'https://www.qiqidys.com/api.php/provide/vod',
-        name: '七七资源',
-    }
+	hhzyapi: {
+			"api": "https://hhzyapi.com/api.php/provide/vod",
+			"name": "豪华资源",
+		},
 };
 
 // 调用全局方法合并
