@@ -76,7 +76,7 @@ const API_SITES = {
     },
     baidu: {
         api: 'https://api.apibdzy.com/api.php/provide/vod',
-        name: '百度云资源'
+        name: '百度资源'
     },
     wujin: {
         api: 'https://api.wujinapi.com/api.php/provide/vod',
@@ -92,7 +92,7 @@ const API_SITES = {
     },
     lzi: {
         api: 'https://cj.lziapi.com/api.php/provide/vod/',
-        name: '量子资源站'
+        name: '量子资源'
    }        
 
 
