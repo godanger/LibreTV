@@ -22,14 +22,7 @@ const SITE_CONFIG = {
 
 // API站点配置
 const API_SITES = {
-    ysgc: {
-            api: 'https://cj.lziapi.com/api.php/provide/vod/',
-            name: '影视工厂'
-        },
-    subo: {
-            api: 'https://subocaiji.com/api.php/provide/vod',
-            name: '速博资源',
-        },
+
     jisu: { 
         api: 'https://jszyapi.com/api.php/provide/vod', 
         name: '极速资源'
@@ -50,54 +43,11 @@ const API_SITES = {
         api: 'https://bfzyapi.com/api.php/provide/vod',
         name: '暴风资源',
     },
-    tyzy: {
+    tyyszy: {
         api: 'https://tyyszy.com/api.php/provide/vod',
         name: '天涯资源',
     },
-	1080zy: {
-			api: 'https://api.1080zyku.com/inc/api_mac10.php',
-			name: '1080资源',
-		},
-	bdzy: {
-			api: 'https://api.apibdzy.com/api.php/provide/vod',
-			name: '百度资源'
-		}, 
-	uku: {
-			api: 'https://api.ukuapi.com/api.php/provide/vod',
-			name: 'U酷资源',
-		},
-	yayazy: {
-			api: 'https://cj.yayazy.net/api.php/provide/vod',
-			name: '丫丫点播',
-		},
-	suoni: {
-			api: 'https://suoniapi.com/api.php/provide/vod',
-			name: '索尼资源',
-		},
-	hongniu: {
-			api: 'https://www.hongniuzy2.com/api.php/provide/vod',
-			name: '红牛资源',
-		},    
-	huya: {
-			api: 'https://www.huyaapi.com/api.php/provide/vod',
-			name: '虎牙资源',
-		},
-    zy360: {
-        api: 'https://360zy.com/api.php/provide/vod',
-        name: '360资源',
-    },
-	maoyan: {
-			api: 'https://api.maoyanapi.top/api.php/provide/vod/at/json',
-			name: '猫眼资源',
-		},
-	jyzy: {
-			api: 'https://jyzyapi.com/provide/vod',
-			name: '金鹰资源',
-		},
-	yzzy: {
-			api: 'https://api.yzzy-api.com/inc/apijson.php',
-			name: '优质资源',
-		},
+
     wolong: {
         api: 'https://wolongzyw.com/api.php/provide/vod',
         name: '卧龙资源',
@@ -116,7 +66,7 @@ const API_SITES = {
         api: 'https://www.mdzyapi.com/api.php/provide/vod',
         name: '魔都资源',
     },
-    zuida: {
+    zuid: {
         api: 'https://api.zuidapi.com/api.php/provide/vod',
         name: '最大资源'
     },
@@ -140,7 +90,7 @@ const API_SITES = {
         api: 'https://ikunzyapi.com/api.php/provide/vod',
         name: 'iKun资源'
     },
-    lzzy: {
+    lzi: {
         api: 'https://cj.lziapi.com/api.php/provide/vod/',
         name: '量子资源站'
    }        
