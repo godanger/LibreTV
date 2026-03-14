@@ -1,9 +1,5 @@
 const CUSTOMER_SITES = {
 
-    uku: {
-        api: 'https://api.ukuapi.com/api.php/provide/vod',
-        name: 'U酷资源'
-    },
     yayazy: {
         api: 'https://cj.yayazy.net/api.php/provide/vod',
         name: '丫丫点播'
@@ -32,7 +28,6 @@ const CUSTOMER_SITES = {
         api: 'https://subocaiji.com/api.php/provide/vod',
         name: '速博资源'
     },
-
     jyzy: {
         api: 'https://jyzyapi.com/provide/vod',
         name: '金鹰资源'
