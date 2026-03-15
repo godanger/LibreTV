@@ -23,10 +23,6 @@ const SITE_CONFIG = {
 // API站点配置
 const API_SITES = {
 
-    jisu: { 
-        api: 'https://jszyapi.com/api.php/provide/vod', 
-        name: '极速资源'
-    },
     ffzy: { 
         api: 'https://api.ffzyapi.com/api.php/provide/vod', 
         name: '非凡资源' 
@@ -43,20 +39,12 @@ const API_SITES = {
         api: 'https://bfzyapi.com/api.php/provide/vod',
         name: '暴风资源',
     },
-    tyyszy: {
-        api: 'https://tyyszy.com/api.php/provide/vod',
-        name: '天涯资源',
-    },
-
+    
     wolong: {
         api: 'https://wolongzyw.com/api.php/provide/vod',
         name: '卧龙资源',
     }, 
 
-    jisu: {
-        api: 'https://jszyapi.com/api.php/provide/vod',
-        name: '极速资源',
-    },
     dbzy: {
         api: 'https://dbzy.tv/api.php/provide/vod',
         name: '豆瓣资源',
@@ -89,12 +77,7 @@ const API_SITES = {
     ikun: {
         api: 'https://ikunzyapi.com/api.php/provide/vod',
         name: 'iKun资源'
-    },
-    lzi: {
-        api: 'https://cj.lziapi.com/api.php/provide/vod/',
-        name: '量子资源'
-   }        
-
+    }
 
 };
 
