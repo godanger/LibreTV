@@ -27,10 +27,6 @@ const CUSTOMER_SITES = {
     yzzy: {
         api: 'https://api.yzzy-api.com/inc/apijson.php',
         name: '优质资源'
-    },
-    hhzyapi: {
-        api: 'https://hhzyapi.com/api.php/provide/vod',
-        name: '豪华资源'
     }
 };
 
