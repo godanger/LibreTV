@@ -1,12 +1,5 @@
 const CUSTOMER_SITES = {
-    yayazy: {
-        api: 'https://cj.yayazy.net/api.php/provide/vod',
-        name: '丫丫点播'
-    },
-    suoni: {
-        api: 'https://suoniapi.com/api.php/provide/vod',
-        name: '索尼资源'
-    },
+
     hongniu: {
         api: 'https://www.hongniuzy2.com/api.php/provide/vod',
         name: '红牛资源'
