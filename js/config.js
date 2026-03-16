@@ -53,7 +53,14 @@ const API_SITES = {
         api: 'https://api.zuidapi.com/api.php/provide/vod',
         name: '最大资源'
     },
-
+    hnzy: {
+        api: 'https://www.hongniuzy2.com/api.php/provide/vod/from/hnm3u8/',
+        name: '红牛资源'
+    },
+    qyzy: {
+        api: 'https://iqiyizyapi.com/api.php/provide/vod',
+        name: 'qiyi资源'
+    },
     baidu: {
         api: 'https://api.apibdzy.com/api.php/provide/vod',
         name: '百度资源'
