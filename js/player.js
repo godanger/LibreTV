@@ -16,7 +16,7 @@ function getProxyUrl(targetUrl) {
     if (!PROXY_CONFIG.enabled || !targetUrl) return targetUrl;
     
     // 如果已经是代理URL，不再重复代理
-    if (targetUrl.includes('/api/proxy/')) return targetUrl;
+    if (targetUrl.includes('/proxy/')) return targetUrl;
     
     // 生成时间戳（10分钟内有效）
     const timestamp = Date.now();
