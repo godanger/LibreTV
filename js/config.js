@@ -63,8 +63,8 @@ const API_SITES = {
         name: '无尽资源'
     },
     ukzy: {
-        api: 'https://api.xinlangapi.com/xinlangapi.php/provide/vod',
-        name: 'xl资源'
+        api: 'https://caiji.maotaizy.cc/api.php/provide/vod',
+        name: '茅台资源'
     },
     ikun: {
         api: 'https://ikunzyapi.com/api.php/provide/vod',
