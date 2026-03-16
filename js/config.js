@@ -57,7 +57,7 @@ const API_SITES = {
         api: 'https://www.hongniuzy2.com/api.php/provide/vod/from/hnm3u8/',
         name: '红牛资源'
     },
-    qyzy: {
+    iqiyi: {
         api: 'https://iqiyizyapi.com/api.php/provide/vod',
         name: 'iqiyi资源'
     },
