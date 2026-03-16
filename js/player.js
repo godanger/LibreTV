@@ -1,49 +1,6 @@
 const selectedAPIs = JSON.parse(localStorage.getItem('selectedAPIs') || '[]');
 const customAPIs = JSON.parse(localStorage.getItem('customAPIs') || '[]'); // 存储自定义API列表
 
-// ============== 添加代理配置 ==============
-const PROXY_CONFIG = {
-    // 代理服务器基础URL，根据实际部署情况修改
-    baseUrl: '/proxy', // Vercel部署后的代理路径
-    // 从环境变量或localStorage获取密码
-    password: localStorage.getItem('proxyPassword') || '', // 需要在设置页面配置
-    // 是否启用代理
-    enabled: true
-};
-
-// 生成带鉴权的代理URL
-function getProxyUrl(targetUrl) {
-    if (!PROXY_CONFIG.enabled || !targetUrl) return targetUrl;
-    
-    // 如果已经是代理URL，不再重复代理
-    if (targetUrl.includes('/proxy/')) return targetUrl;
-    
-    // 生成时间戳（10分钟内有效）
-    const timestamp = Date.now();
-    
-    // 生成密码哈希（需要引入crypto-js或使用Web Crypto API）
-    // 这里使用简单的占位，实际需要使用SHA-256
-    const authHash = generateAuthHash(PROXY_CONFIG.password, timestamp);
-    
-    // 构建代理URL
-    const encodedUrl = encodeURIComponent(targetUrl);
-    return `${PROXY_CONFIG.baseUrl}/${encodedUrl}?auth=${authHash}&t=${timestamp}`;
-}
-
-// 生成认证哈希（使用Web Crypto API）
-async function generateAuthHash(password, timestamp) {
-    if (!password) return '';
-    
-    // 使用Web Crypto API生成SHA-256哈希
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
-}
-// ============== 代理配置结束 ==============
-
 // 改进返回功能
 function goBack(event) {
     // 防止默认链接行为
@@ -444,12 +401,7 @@ function initPlayer(videoUrl) {
     if (!videoUrl) {
         return
     }
-    // ============== 添加代理转换 ==============
-    // 将原始视频URL转换为代理URL
-    const proxyVideoUrl = getProxyUrl(videoUrl);
-    console.log('原始URL:', videoUrl);
-    console.log('代理URL:', proxyVideoUrl);
-    // ============== 代理转换结束 ==============
+
     // 销毁旧实例
     if (art) {
         art.destroy();
@@ -488,7 +440,7 @@ function initPlayer(videoUrl) {
     // Create new ArtPlayer instance
     art = new Artplayer({
         container: '#player',
-        url: proxyVideoUrl, // 使用代理URL替换原来的 videoUrl
+        url: videoUrl,
         type: 'm3u8',
         title: videoTitle,
         volume: 0.8,
@@ -965,10 +917,7 @@ function playEpisode(index) {
 
     // 准备切换剧集的URL
     const url = currentEpisodes[index];
-    // ============== 添加代理转换 ==============
-    // 将剧集URL转换为代理URL
-    const proxyUrl = getProxyUrl(url);
-    // ============== 代理转换结束 ==============
+
     // 更新当前剧集索引
     currentEpisodeIndex = index;
     currentVideoUrl = url;
@@ -984,9 +933,9 @@ function playEpisode(index) {
     window.history.replaceState({}, '', currentUrl.toString());
 
     if (isWebkit) {
-        initPlayer(proxyUrl); // 使用代理URL初始化播放器
+        initPlayer(url);
     } else {
-        art.switch = proxyUrl; // 使用代理URL切换
+        art.switch = url;
     }
 
     // 更新UI
@@ -1156,7 +1105,7 @@ function saveToHistory() {
     // 构建要保存的视频信息对象
     const videoInfo = {
         title: currentVideoTitle,
-        directVideoUrl: currentVideoUrl, // 保存原始URL，不是代理URL
+        directVideoUrl: currentVideoUrl, // Current episode's direct URL
         url: `player.html?url=${encodeURIComponent(currentVideoUrl)}&title=${encodeURIComponent(currentVideoTitle)}&source=${encodeURIComponent(sourceName)}&source_code=${encodeURIComponent(sourceCode)}&id=${encodeURIComponent(id_from_params || '')}&index=${currentEpisodeIndex}&position=${Math.floor(currentPosition || 0)}`,
         episodeIndex: currentEpisodeIndex,
         sourceName: sourceName,
