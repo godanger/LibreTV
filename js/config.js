@@ -53,10 +53,7 @@ const API_SITES = {
         api: 'https://api.zuidapi.com/api.php/provide/vod',
         name: '最大资源'
     },
-    yinghua: {
-        api: 'https://m3u8.apiyhzy.com/api.php/provide/vod',
-        name: '樱花资源'
-    },
+
     baidu: {
         api: 'https://api.apibdzy.com/api.php/provide/vod',
         name: '百度资源'
