@@ -63,8 +63,8 @@ const API_SITES = {
         name: '无尽资源'
     },
     wwzy: {
-        api: 'https://caiji.maotaizy.cc/api.php/provide/vod/at/josn/',
-        name: '茅台资源'
+        api: 'https://api.wsyzy.net/api.php/provide/vod/?ac=list',
+        name: '无水印'
     },
     ikun: {
         api: 'https://ikunzyapi.com/api.php/provide/vod',
