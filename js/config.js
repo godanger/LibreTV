@@ -49,7 +49,7 @@ const API_SITES = {
         api: 'https://www.mdzyapi.com/api.php/provide/vod',
         name: '魔都资源',
     },
-    zuid: {
+    zdzy: {
         api: 'https://api.zuidapi.com/api.php/provide/vod',
         name: '最大资源'
     },
@@ -62,9 +62,9 @@ const API_SITES = {
         api: 'https://api.wujinapi.com/api.php/provide/vod',
         name: '无尽资源'
     },
-    wwzy: {
-        api: 'https://suoniapi.com/api.php/provide/vod/?ac=list',
-        name: '索尼资源'
+    ukzy: {
+        api: 'https://api.ukuapi88.com/api.php/provide/vod/',
+        name: 'U酷资源'
     },
     ikun: {
         api: 'https://ikunzyapi.com/api.php/provide/vod',
