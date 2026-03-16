@@ -39,11 +39,6 @@ const API_SITES = {
         api: 'https://bfzyapi.com/api.php/provide/vod',
         name: '暴风资源',
     },
-    
-    wolong: {
-        api: 'https://wolongzyw.com/api.php/provide/vod',
-        name: '卧龙资源',
-    }, 
 
     mdzy: {
         api: 'https://www.mdzyapi.com/api.php/provide/vod',
