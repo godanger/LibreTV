@@ -5,10 +5,6 @@ const CUSTOMER_SITES = {
         name: '猫眼资源'
     },
 
-    jyzy: {
-        api: 'https://jyzyapi.com/provide/vod',
-        name: '金鹰资源'
-    },
     yzzy: {
         api: 'https://api.yzzy-api.com/inc/apijson.php',
         name: '优质资源'
