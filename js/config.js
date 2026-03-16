@@ -59,7 +59,7 @@ const API_SITES = {
     },
     qyzy: {
         api: 'https://iqiyizyapi.com/api.php/provide/vod',
-        name: 'qiyi资源'
+        name: 'iqiyi资源'
     },
     baidu: {
         api: 'https://api.apibdzy.com/api.php/provide/vod',
