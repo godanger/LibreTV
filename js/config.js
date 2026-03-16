@@ -62,9 +62,9 @@ const API_SITES = {
         api: 'https://api.wujinapi.com/api.php/provide/vod',
         name: '无尽资源'
     },
-    okzy: {
-        api: 'https://api.okzyw.net/api.php/provide/vod/',
-        name: 'OK资源'
+    ukzy: {
+        api: 'https://api.ukuapi88.com/api.php/provide/vod/',
+        name: 'U酷资源'
     },
     ikun: {
         api: 'https://ikunzyapi.com/api.php/provide/vod',
