@@ -1,5 +1,12 @@
 const CUSTOMER_SITES = {
-
+    ysgc: {
+        api: 'https://cj.lziapi.com/api.php/provide/vod/',
+        name: '影视工厂'
+    },
+    subo: {
+        api: 'https://subocaiji.com/api.php/provide/vod',
+        name: '速博资源'
+    },
 
     maoyan: {
         api: 'https://api.maoyanapi.top/api.php/provide/vod/at/json',
