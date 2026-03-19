@@ -617,9 +617,9 @@ function renderDoubanCards(data, container, clear = true) {
                 .replace(/>/g, '&gt;');
             
             // 处理图片URL
-            // 1. 直接使用豆瓣图片URL (添加no-referrer属性)https://ddtv.dpdns.org/?url=https://img.uumoe.com/
+            // 1. 直接使用豆瓣图片URL (添加no-referrer属性)https://ddtv.dpdns.org/?url=https://img.uumoe.com/img.doubanio.cmliussss.com
             //const originalCoverUrl = item.cover;
-            const originalCoverUrl = (item.cover || '').replace(/img\d*\.doubanio\.com/g, 'img.doubanio.cmliussss.com');
+            const originalCoverUrl = (item.cover || '').replace(/img\d*\.doubanio\.com/g, 'img.uumoe.com');
             
             // 2. 也准备代理URL作为备选
             const proxiedCoverUrl = PROXY_URL + encodeURIComponent(originalCoverUrl);
