@@ -49,7 +49,7 @@ const API_SITES = {
         name: '最大资源'
     },
     hnzy: {
-        api: 'https://www.hongniuzy2.com/api.php/provide/vod/from/hnm3u8/',
+        api: 'https://www.hongniuzy2.com/api.php/provide/vod',
         name: '红牛资源'
     },
     iqiyi: {
